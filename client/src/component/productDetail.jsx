@@ -12,6 +12,7 @@ export const ProductDetail = () => {
   // Destructure product data from state
   const { addToCart } = useCart();
   const [productDetails, setProductDetails] = useState(location.state?.formData || null); // Use state data if available
+  console.log('productDetails', productDetails)
   const [cartOpen, setCartOpen] = useState(false);
   const [color, setColor] = useState('Blue');
   const [size, setSize] = useState('Medium');
@@ -80,22 +81,21 @@ export const ProductDetail = () => {
           <Grid container spacing={2} display="flex" justifyContent="space-between">
             <Grid item xs={12} md={5.5} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
               {/* Display multiple images */}
-              {productDetails.images && productDetails.images.length > 0 ? (
-                productDetails.images.map((imageUrl, index) => (
+              {/* {productDetails.image ? (
                   <img
                     key={index}
-                    src={imageUrl}
+                    src={pr}
                     alt={`Product Image ${index + 1}`}
                     style={{ maxWidth: '100%', maxHeight: '70%', borderRadius: '10%', marginTop: '5%', marginBottom: '15px' }}
                   />
                 ))
-              ) : (
+              ) : ( */}
                 <img
-                  src={productDetails.imageUrl}
+                  src={productDetails.image}
                   alt={productDetails.name}
                   style={{ maxWidth: '100%', maxHeight: '70%', borderRadius: '10%', marginTop: '5%' }}
                 />
-              )}
+              {/* )} */}
             </Grid>
 
             <Grid item xs={12} md={6.5}>

@@ -12,34 +12,34 @@ function ProductList() {
   const location = useLocation();
   const { category } = location.state || {};
 
-  const BASE_URL = 'http://localhost:8000/'; 
+  const BASE_URL = 'http://localhost:8000/';
 
   useEffect(() => {
     if (category) {
       axios.get(`${BASE_URL}api/product/`)
         .then(response => {
           const { products } = response.data;
-
+          console.log('products', products)
           const processedProducts = products.map(product => {
-            const imageUrlArray = Array.isArray(product.imageUrl)
-              ? product.imageUrl.map(img => `${BASE_URL}${img.replace(/\\/g, '/')}`)
-              : [];
-            
-            const imagesArray = Array.isArray(product.images)
-              ? product.images.map(img => `${BASE_URL}${img.replace(/\\/g, '/')}`)
-              : [];
+            // const imageUrlArray = Array.isArray(product.imageUrl)
+            //   ? product.imageUrl.map(img => `${BASE_URL}${img.replace(/\\/g, '/')}`)
+            //   : [];
 
-            const combinedImages = [...imageUrlArray, ...imagesArray];
+            const image = product.image
+              ? `${BASE_URL}${product.image}`
+              : "";
+
+            // const combinedImages = [...imageUrlArray, ...imagesArray];
 
             return {
               ...product,
-              images: combinedImages, 
+              image: image
             };
           });
 
           setProducts(processedProducts);
           setLoading(false);
-          console.log('productProccessed :',processedProducts )
+          console.log('productProccessed :', processedProducts)
         })
         .catch(() => {
           setError('Failed to load products. Please try again later.');
@@ -63,7 +63,7 @@ function ProductList() {
   const filteredProducts = products.filter(product => product.category === category);
 
   return (
-    <Container sx={{  marginBottom:'5%'}}>
+    <Container sx={{ marginBottom: '5%' }}>
       <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', marginBottom: '5%', }}>{category}</Typography>
       <Grid container spacing={3}>
         {filteredProducts.length > 0 ? (
@@ -74,7 +74,7 @@ function ProductList() {
                   const formData = {
                     id: item._id,
                     name: item.name,
-                    images: item.images, // Use images for navigation
+                    image: item.image, // Use images for navigation
                     price: item.price,
                     category: item.category,
                     subCategory: item.subCategory,
@@ -115,9 +115,7 @@ function ProductList() {
                   >
                     {/* Display the first available image */}
                     <img
-                      src={Array.isArray(item.images) && item.images.length > 0 
-                        ? item.images[0] 
-                        : `${BASE_URL}default-image.png`} // Fallback image
+                      src={item.image} // Fallback image
                       alt={item.name}
                       style={{
                         width: '100%',

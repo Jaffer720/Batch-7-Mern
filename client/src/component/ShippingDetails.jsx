@@ -13,12 +13,12 @@ const ShippingDetails = () => {
     e.preventDefault();
     const dataToSend = {
       customerDetails: userDetails,
-      cartItems,
-      totalPrice: cartItems.reduce((total, item) => total + item.price, 0),
+      items:cartItems,
+      total: cartItems.reduce((total, item) => total + item.price, 0),
     };
 
     try {
-      const response = await axios.post('http://localhost:8000/api/invoice/', dataToSend, {
+      const response = await axios.post(`http://localhost:8000/api/order/${userDetails._id}`, dataToSend, {
         headers: {
           'Content-Type': 'application/json',
         },
