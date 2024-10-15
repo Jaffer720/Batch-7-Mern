@@ -1,5 +1,6 @@
 import Order from '../model/order.model.js';
-
+import Invoice from '../model/invoice.model.js';
+import User from '../model/user.model.js';
 // Get all orders
 export const getOrders = async (req, res) => {
     try {
@@ -23,14 +24,53 @@ export const getOrderById = async (req, res) => {
 
 // Create a new order
 export const createOrder = async (req, res) => {
-
+    const { id } = req.params; // User ID from params
+    const { name, email, address, phoneNo,  } = req.body.customerDetails
     try {
-        const newOrder = new Order(req.body);
+        // 1. Create a new Order
+        const newOrder = new Order({
+            name:name,
+            email:email,
+            items:req.body.items,
+            total:req.body.total
+        });
         await newOrder.save();
-        res.status(201).json(newOrder);
+
+        // 2. Create an Invoice for the new Order
+        const newInvoice = new Invoice({
+            invoiceNumber: generateInvoiceNumber(), // You might want to implement a function to generate this
+            issueDate: Date.now(),
+            customer: id, // Referencing the user ID
+            items: req.body.items, // Assuming you have items in the request body
+            // quantities: req.body.quantities, // Assuming quantities are sent in the request body
+            // subtotal: req.body.subtotal, // Assuming subtotal is calculated beforehand
+            total: req.body.total, // Assuming total is calculated
+            paymentStatus: req.body.paymentStatus || "pending", // Default to "pending"
+            notes: req.body.notes || "", // Optional notes
+        });
+        await newInvoice.save();
+
+        // 3. Update the user by pushing the new order to the user's "Orders" array
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { $push: { Orders: newOrder } }, // Add the new order to the Orders array
+            { new: true } // Return the updated user document
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // 4. Respond with the new order and invoice
+        res.status(201).json({ order: newOrder, invoice: newInvoice });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
+};
+
+// Helper function to generate a unique invoice number
+const generateInvoiceNumber = () => {
+    return `INV-${Date.now()}`;
 };
 
 // Update an existing order

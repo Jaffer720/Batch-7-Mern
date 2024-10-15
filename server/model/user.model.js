@@ -10,9 +10,7 @@ const userSchema = new mongoose.Schema({
       unique: true,
       trim: true
   },
-  Orders: {
-    type: Array,
-},
+  Orders: Array,
   email: {
       type: String,
       required: true,
