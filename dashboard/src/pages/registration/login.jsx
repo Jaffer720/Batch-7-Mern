@@ -2,21 +2,24 @@ import React, { useState } from 'react';
 import { Grid, Box, TextField, Button, Typography, Link } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from 'context/authContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth()
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/login', { email, password })
-      .then((response)=>{
-        console.log(response.data)
-        navigate('/');
+      await axios.post('http://localhost:8000/api/auth/login', { email, password })
+        .then((res) => {
+          console.log(res.data)
+          login(res.data.detail)
+          navigate('/');
 
-      })
-  
+        })
+
     } catch (error) {
       console.error('Login error:', error);
     }
