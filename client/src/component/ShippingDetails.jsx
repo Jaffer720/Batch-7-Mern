@@ -1,39 +1,56 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Grid, Paper } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useCart } from './cartContext';  // Assuming the CartContext is in a folder named context
 
 const ShippingDetails = () => {
+  const location = useLocation();
   const navigate = useNavigate();
-  const { cartItems, userDetails, clearCart, saveOrder } = useCart();
+  const { cartItems, totalPrice } = location.state || { cartItems: [], totalPrice: 0 };
+
+  const [customerDetails, setCustomerDetails] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    postalCode: '',
+  });
+
   const [error, setError] = useState(null);
+
+  console.log("Product Details ",location.state)
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCustomerDetails({
+      ...customerDetails,
+      [name]: value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const dataToSend = {
-      customerDetails: userDetails,
-      items:cartItems,
-      total: cartItems.reduce((total, item) => total + item.price, 0),
+      customerDetails,
+      cartItems,
+      totalPrice,
     };
 
     try {
-      const response = await axios.post(`http://localhost:8000/api/order/${userDetails._id}`, dataToSend, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    //   const response = await axios.post('http://localhost:8000/api/purchase/', dataToSend, {
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //   });
 
-      if (response.status === 201) {
-        // Save the order in the context
-        saveOrder(dataToSend);
-        // Clear the cart after processing shipping
-        clearCart();
-        // Navigate to the Thank You page
-        navigate('/thankyou', { state: { cartItems, totalPrice: dataToSend.totalPrice, customerDetails: userDetails } });
-      } else {
-        setError('Something went wrong. Please try again later.');
-      }
+    //   if (response.status === 200) {
+    //     navigate('/thankyou', { state: { cartItems, totalPrice, customerDetails } });
+    //   } else {
+    //     setError('Something went wrong. Please try again later.');
+    //   }
+   console.log("Shipping Component",customerDetails)
+      navigate('/thankyou', { state: { cartItems, totalPrice, customerDetails } });
+
     } catch (error) {
       console.error('Error:', error);
       setError('Error processing the request. Please try again later.');
@@ -41,7 +58,7 @@ const ShippingDetails = () => {
   };
 
   return (
-    <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'90vh'}>
+    <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'90vh'} marginTop={'6.5%'}>
       <Paper elevation={3} sx={{ padding: 4, width: '70%' }}>
         <Typography variant="h5" marginBottom={4}>
           Shipping Details
@@ -53,15 +70,14 @@ const ShippingDetails = () => {
         )}
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
+            {/* Customer Details Form Fields */}
+            <Grid item xs={12} sm={6} >
               <TextField
                 fullWidth
                 label="Customer Name"
                 name="name"
-                value={userDetails.name}
-                InputProps={{
-                  readOnly: true,
-                }}
+                value={customerDetails.name}
+                onChange={handleChange}
                 required
               />
             </Grid>
@@ -71,10 +87,8 @@ const ShippingDetails = () => {
                 label="Email"
                 name="email"
                 type="email"
-                value={userDetails.email}
-                InputProps={{
-                  readOnly: true,
-                }}
+                value={customerDetails.email}
+                onChange={handleChange}
                 required
               />
             </Grid>
@@ -84,10 +98,8 @@ const ShippingDetails = () => {
                 label="Phone Number"
                 name="phone"
                 type="tel"
-                value={userDetails.phone}
-                InputProps={{
-                  readOnly: false,
-                }}
+                value={customerDetails.phone}
+                onChange={handleChange}
                 required
               />
             </Grid>
@@ -96,10 +108,8 @@ const ShippingDetails = () => {
                 fullWidth
                 label="Postal Code"
                 name="postalCode"
-                value={userDetails.postalCode}
-                InputProps={{
-                  readOnly: true,
-                }}
+                value={customerDetails.postalCode}
+                onChange={handleChange}
                 required
               />
             </Grid>
@@ -108,10 +118,8 @@ const ShippingDetails = () => {
                 fullWidth
                 label="Address"
                 name="address"
-                value={userDetails.address}
-                InputProps={{
-                  readOnly: true,
-                }}
+                value={customerDetails.address}
+                onChange={handleChange}
                 multiline
                 rows={4}
                 required
