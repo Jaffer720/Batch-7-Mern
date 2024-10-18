@@ -4,17 +4,23 @@ import axios from 'axios';
 
 const Profile = () => {
   const [userDetails, setUserDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (!storedUser) {
       console.error('No user data found in localStorage.');
+      setError('No user data found.');
+      setLoading(false);
       return;
     }
 
     const user = JSON.parse(storedUser);
     if (!user || !user._id) {
       console.error('User ID not found in localStorage.');
+      setError('Invalid user data.');
+      setLoading(false);
       return;
     }
 
@@ -24,16 +30,23 @@ const Profile = () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/user/${userId}`);
         setUserDetails(response.data.Data);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching user details:', error);
+        setError('Error fetching user details.');
+        setLoading(false);
       }
     };
 
     fetchUserDetails();
   }, []);
 
-  if (!userDetails) {
+  if (loading) {
     return <Typography variant="h6">Loading Profile...</Typography>;
+  }
+
+  if (error) {
+    return <Typography variant="h6" color="error">{error}</Typography>;
   }
 
   return (
