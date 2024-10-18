@@ -71,12 +71,12 @@ const ViewProfile = () => {
                                     {address?.street}, {address?.city}, {address?.state}, {address?.postalCode}, {address?.country}
                                 </Typography>
                             </Grid>
-                            {roles !== [] && roles[0]==='user' &&
+                            {roles !== [] && roles[0] === 'user' &&
                                 (<Grid item xs={12}>
                                     <Typography variant="subtitle1">Orders:</Typography>
                                     <Typography variant="body1">{Orders.length} order(s)</Typography>
                                 </Grid>)
-                                }
+                            }
                         </Grid>
                     </CardContent>
                 ) :
