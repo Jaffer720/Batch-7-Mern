@@ -14,6 +14,7 @@ const Orders = Loadable(lazy(() => import('../pages/Orders/Orders')));
 const Products = Loadable(lazy(() => import('../pages/Products/Products')));
 const Buyer = Loadable(lazy(() => import('../pages/Buyer/Buyer')));
 const Customers = Loadable(lazy(() => import('../pages/Customers/Customers')));
+const ViewProfile  = Loadable(lazy(() => import('../pages/profile/viewProfile')));
 const Login = Loadable(lazy(() => import('../pages/registration/login')))
 const Signup = Loadable(lazy(() => import('../pages/registration/registration')))
 
@@ -59,6 +60,10 @@ const ComponentsRoutes = {
     {
       path: 'settings',
       element: <Settings />
+    },
+    {
+      path: 'profile',
+      element: <ViewProfile />
     },
   ],
   

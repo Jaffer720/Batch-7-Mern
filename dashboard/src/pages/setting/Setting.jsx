@@ -47,12 +47,6 @@ const ProfileSettings = () => {
           <Grid item xs={12} sm={6}>
             <TextField fullWidth label="Role" defaultValue="" />
           </Grid>
-          {/* <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="Status" defaultValue="" />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="Department" defaultValue="" />
-          </Grid> */}
         </Grid>
       </Box>
 
@@ -62,15 +56,6 @@ const ProfileSettings = () => {
           <Grid item xs={12} sm={6}>
             <TextField fullWidth label="Phone" defaultValue="" />
           </Grid>
-          {/* <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="Website" defaultValue="http://" />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="Languages" defaultValue="English" />
-          </Grid> */}
-          {/* <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="Address Line 1" defaultValue="" />
-          </Grid> */}
           <Grid item xs={12} sm={6}>
             <TextField fullWidth label="Address " defaultValue="" />
           </Grid>
@@ -80,32 +65,13 @@ const ProfileSettings = () => {
           <Grid item xs={12} sm={6}>
             <TextField fullWidth label="City" defaultValue="" />
           </Grid>
-          {/* <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="State" defaultValue="" />
-          </Grid> */}
           <Grid item xs={12} sm={6}>
             <TextField fullWidth label="Country" defaultValue="" />
           </Grid>
         </Grid>
       </Box>
 
-      {/* <Box sx={commonBoxStyle}>
-        <Typography variant="h6" sx={{ pb: 2 }}>Social Profiles</Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="Twitter" defaultValue="" />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="Facebook" defaultValue="" />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="Instagram" defaultValue="" />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="GitHub" defaultValue="" />
-          </Grid>
-        </Grid>
-      </Box> */}
+     
     </>
   );
 
