@@ -28,6 +28,7 @@ import IconButton from 'components/@extended/IconButton';
 import avatar1 from 'assets/images/users/avatar-6.png';
 import { Setting2, Profile, Logout } from 'iconsax-react';
 import { useNavigate } from 'react-router';
+import { useAuth } from 'context/authContext';
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -60,8 +61,12 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     // Logout
+    logout()
     Navigate('/login')
   };
+
+  const { user, logout } = useAuth();
+  console.log('user', user)
 
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -142,7 +147,7 @@ export default function ProfilePage() {
                         <Stack direction="row" spacing={1.25} alignItems="center">
                           <Avatar alt="profile user" src={avatar1} />
                           <Stack>
-                            <Typography variant="subtitle1">Admin</Typography>
+                            {user && <Typography variant="subtitle1">{`${user.firstName} ${user.lastName}`}</Typography>}
                             <Typography variant="body2" color="secondary"></Typography>
                           </Stack>
                         </Stack>

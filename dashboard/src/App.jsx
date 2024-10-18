@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import router from './routes/index';
 import ThemeCustomization from 'themes';
 import ScrollTop from 'components/ScrollTop';
+import { AuthProvider } from 'context/authContext';
 
 // ==============================|| APP - THEME, ROUTER, LOCAL  ||============================== //
 
@@ -11,7 +12,9 @@ export default function App() {
   return (
     <ThemeCustomization>
       <ScrollTop>
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
       </ScrollTop>
     </ThemeCustomization>
   );
