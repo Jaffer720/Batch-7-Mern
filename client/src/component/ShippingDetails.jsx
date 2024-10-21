@@ -1,128 +1,133 @@
-import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Grid, Paper } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, TextField, Button, Paper, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useCart } from './cartContext';  // Assuming the CartContext is in a folder named context
 
 const ShippingDetails = () => {
-  const navigate = useNavigate();
-  const { cartItems, userDetails, clearCart, saveOrder } = useCart();
+  const [userDetails, setUserDetails] = useState(null);
+  const [shippingDetails, setShippingDetails] = useState({});
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setUserDetails(user);
+      setShippingDetails(user.address || {});
+      setLoading(false);
+    } else {
+      setError('User data not found.');
+      setLoading(false);
+    }
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setShippingDetails((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const dataToSend = {
-      customerDetails: userDetails,
-      items:cartItems,
-      total: cartItems.reduce((total, item) => total + item.price, 0),
-    };
-
     try {
-      const response = await axios.post(`http://localhost:8000/api/order/${userDetails._id}`, dataToSend, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const response = await axios.post(`http://localhost:8000/api/order/${userDetails._id}`, {
+        shippingDetails,
+        userId: userDetails._id,
       });
 
       if (response.status === 201) {
-        // Save the order in the context
-        saveOrder(dataToSend);
-        // Clear the cart after processing shipping
-        clearCart();
-        // Navigate to the Thank You page
-        navigate('/thankyou', { state: { cartItems, totalPrice: dataToSend.totalPrice, customerDetails: userDetails } });
+        navigate('/thankyou', { state: { shippingDetails, userDetails } });
       } else {
-        setError('Something went wrong. Please try again later.');
+        const errorMessage = 'Error submitting shipping details.';
+        setError(errorMessage);
+        navigate('/thankyou', { state: { shippingDetails, userDetails, error: errorMessage } });
       }
     } catch (error) {
       console.error('Error:', error);
-      setError('Error processing the request. Please try again later.');
+      
+      let errorMessage;
+      if (error.response) {
+        // Server responded with a status code outside of the range of 2xx
+        errorMessage = `Error: ${error.response.status} - ${error.response.data.message || 'Request failed.'}`;
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage = 'No response received from server. Please check if the backend is running.';
+      } else {
+        // Something else triggered the error
+        errorMessage = `Error: ${error.message}`;
+      }
+
+      setError(errorMessage);
+      navigate('/thankyou', { state: { shippingDetails, userDetails, error: errorMessage } });
     }
   };
 
+  if (loading) {
+    return <Typography variant="h6">Loading Shipping Details...</Typography>;
+  }
+
+  if (error) {
+    return <Typography variant="h6" color="error">{error}</Typography>;
+  }
+
   return (
-    <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'90vh'}>
-      <Paper elevation={3} sx={{ padding: 4, width: '70%' }}>
-        <Typography variant="h5" marginBottom={4}>
-          Shipping Details
+    <Box display="flex" justifyContent="center" alignItems="center" height="90vh">
+      <Paper elevation={3} sx={{ padding: '20px', width: '400px' }}>
+        <Typography variant="h5" gutterBottom>
+          Confirm Shipping Details
         </Typography>
-        {error && (
-          <Typography variant="body1" color="error" marginBottom={2}>
-            {error}
-          </Typography>
-        )}
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Customer Name"
-                name="name"
-                value={userDetails.name}
-                InputProps={{
-                  readOnly: true,
-                }}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Email"
-                name="email"
-                type="email"
-                value={userDetails.email}
-                InputProps={{
-                  readOnly: true,
-                }}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Phone Number"
-                name="phone"
-                type="tel"
-                value={userDetails.phone}
-                InputProps={{
-                  readOnly: false,
-                }}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Postal Code"
-                name="postalCode"
-                value={userDetails.postalCode}
-                InputProps={{
-                  readOnly: true,
-                }}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Address"
-                name="address"
-                value={userDetails.address}
-                InputProps={{
-                  readOnly: true,
-                }}
-                multiline
-                rows={4}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} display={'flex'} justifyContent={'flex-end'}>
-              <Button type="submit" variant="contained" color="primary">
-                Process Shipping
-              </Button>
-            </Grid>
-          </Grid>
+          <TextField
+            fullWidth
+            label="Street"
+            name="street"
+            value={shippingDetails.street || ''}
+            onChange={handleInputChange}
+            margin="normal"
+            required
+          />
+          <TextField
+            fullWidth
+            label="City"
+            name="city"
+            value={shippingDetails.city || ''}
+            onChange={handleInputChange}
+            margin="normal"
+            required
+          />
+          <TextField
+            fullWidth
+            label="State"
+            name="state"
+            value={shippingDetails.state || ''}
+            onChange={handleInputChange}
+            margin="normal"
+            required
+          />
+          <TextField
+            fullWidth
+            label="Postal Code"
+            name="postalCode"
+            value={shippingDetails.postalCode || ''}
+            onChange={handleInputChange}
+            margin="normal"
+            required
+          />
+          <TextField
+            fullWidth
+            label="Country"
+            name="country"
+            value={shippingDetails.country || ''}
+            onChange={handleInputChange}
+            margin="normal"
+            required
+          />
+          <Box display="flex" justifyContent="flex-end" marginTop="20px">
+            <Button type="submit" variant="contained" color="primary">
+              Submit Shipping
+            </Button>
+          </Box>
         </form>
       </Paper>
     </Box>
