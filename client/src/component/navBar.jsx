@@ -89,9 +89,9 @@ const NavBar = () => {
           {userName ? (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <IconButton onClick={handleMenuClick} sx={{ p: 0 }}>
-                <Avatar alt={userName} sx={{ bgcolor: 'darkblue' }}>
+                {/* <Avatar alt={userName} sx={{ bgcolor: 'darkblue' }}>
                   <AccountCircleIcon />
-                </Avatar>
+                </Avatar> */}
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu} sx={{ mt: '15px' }}>
                 <MenuItem onClick={() => { handleCloseMenu(); navigate('/profile'); }}>My Profile</MenuItem>
