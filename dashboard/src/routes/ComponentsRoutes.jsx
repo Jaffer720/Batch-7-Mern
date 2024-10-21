@@ -15,6 +15,8 @@ const Products = Loadable(lazy(() => import('../pages/Products/Products')));
 const Buyer = Loadable(lazy(() => import('../pages/Buyer/Buyer')));
 const Customers = Loadable(lazy(() => import('../pages/Customers/Customers')));
 const ViewProfile  = Loadable(lazy(() => import('../pages/profile/viewProfile')));
+const FeedbackForm  = Loadable(lazy(() => import('../pages/profile-setting/feedback')));
+const PolicyComponent  = Loadable(lazy(() => import('../pages/profile-setting/privacy')));
 const Login = Loadable(lazy(() => import('../pages/registration/login')))
 const Signup = Loadable(lazy(() => import('../pages/registration/registration')))
 
@@ -64,6 +66,14 @@ const ComponentsRoutes = {
     {
       path: 'profile',
       element: <ViewProfile />
+    },
+     {
+      path: 'feedback',
+      element: <FeedbackForm />
+    },
+    {
+      path: 'policy',
+      element: <PolicyComponent />
     },
   ],
   

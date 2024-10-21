@@ -1,19 +1,14 @@
-import { useState } from 'react';
-
-// material-ui
-import List from '@mui/material/List';
-import Link from '@mui/material/Link';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import React, { useState } from 'react';
+import { List, Link, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 // assets
-import { Clipboard, I24Support, Lock1, Messages1, Profile } from 'iconsax-react';
-
-// ==============================|| HEADER PROFILE - SETTING TAB ||============================== //
+import { I24Support, Lock1, Messages1 } from 'iconsax-react';
 
 export default function SettingTab() {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const navigate = useNavigate(); // Use useNavigate for navigation
+
   const handleListItemClick = (event, index) => {
     setSelectedIndex(index);
   };
@@ -28,32 +23,22 @@ export default function SettingTab() {
           <ListItemText primary="Support" />
         </ListItemButton>
       </Link>
-      {/* <ListItemButton selected={selectedIndex === 1} onClick={(event) => handleListItemClick(event, 1)}>
-        <ListItemIcon>
-          <Profile variant="Bulk" size={18} />
-        </ListItemIcon>
-        <ListItemText primary="Account Settings" />
-      </ListItemButton> */}
-      <ListItemButton selected={selectedIndex === 2} onClick={(event) => handleListItemClick(event, 2)}>
+
+      <ListItemButton selected={selectedIndex === 2} onClick={() => navigate('/policy')}>
         <ListItemIcon>
           <Lock1 variant="Bulk" size={18} />
         </ListItemIcon>
         <ListItemText primary="Privacy Center" />
       </ListItemButton>
+
       <Link style={{ textDecoration: 'none' }}>
-        <ListItemButton selected={selectedIndex === 3} onClick={(event) => handleListItemClick(event, 3)}>
+        <ListItemButton selected={selectedIndex === 3} onClick={() => navigate('/feedback')}>
           <ListItemIcon>
             <Messages1 variant="Bulk" size={18} />
           </ListItemIcon>
           <ListItemText primary="Feedback" />
         </ListItemButton>
       </Link>
-      {/* <ListItemButton selected={selectedIndex === 4} onClick={(event) => handleListItemClick(event, 4)}>
-        <ListItemIcon>
-          <Clipboard variant="Bulk" size={18} />
-        </ListItemIcon>
-        <ListItemText primary="History" />
-      </ListItemButton> */}
     </List>
   );
 }
