@@ -46,8 +46,13 @@ const InvoiceList = () => {
         size: 100,
       },
       {
-        accessorKey: 'customer',
-        header: 'Customer',
+        accessorKey: 'Items',
+        header: 'Items',
+        size: 100,
+      },
+      {
+        accessorKey: 'customer.email', // Use a specific field of customer
+        header: 'Customer Email',
         size: 200,
       },
       {
@@ -129,16 +134,31 @@ const InvoiceList = () => {
 
       {/* Detail Modal */}
       <Modal open={openDetailModal} onClose={() => setOpenDetailModal(false)}>
-        <Box sx={{ padding: 4, backgroundColor: 'white', margin: 'auto', marginTop: '1%', width: 400, borderRadius: '8px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+        <Box
+          sx={{
+            padding: 4,
+            backgroundColor: 'white',
+            margin: 'auto',
+            marginTop: '1%',
+            width: 400,
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          }}
+        >
           <Typography variant="h6" gutterBottom>
             Invoice Details
           </Typography>
           <Typography>Invoice Number: {selectedInvoice?.invoiceNumber}</Typography>
           <Typography>Issue Date: {selectedInvoice?.issueDate}</Typography>
           <Typography>Due Date: {selectedInvoice?.dueDate}</Typography>
-          <Typography>Customer: {selectedInvoice?.customer}</Typography>
-          <Typography>Items: {selectedInvoice?.items}</Typography>
-          <Typography>Quantities: {selectedInvoice?.quantities}</Typography>
+          <Typography>
+            Customer Email: {selectedInvoice?.customer?.email || 'N/A'}
+          </Typography>
+          <Typography>
+            Customer ID: {selectedInvoice?.customer?._id || 'N/A'}
+          </Typography>
+          <Typography>Items: {selectedInvoice?.items?.join(', ')}</Typography>
+          <Typography>Quantities: {selectedInvoice?.quantities?.join(', ')}</Typography>
           <Typography>Subtotal: {selectedInvoice?.subtotal}</Typography>
           <Typography>Total: {selectedInvoice?.total}</Typography>
           <Typography>Payment Status: {selectedInvoice?.paymentStatus}</Typography>
