@@ -12,9 +12,9 @@ export const CartProvider = ({ children }) => {
     return savedCartItems ? JSON.parse(savedCartItems) : [];
   });
 
-  const [userDetails, setUserDetails] = useState(() => {
-    const savedUserDetails = localStorage.getItem('userDetails');
-    return savedUserDetails ? JSON.parse(savedUserDetails) : {};
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : {};
   });
 
   const [orders, setOrders] = useState(() => {
@@ -25,9 +25,9 @@ export const CartProvider = ({ children }) => {
   // Sync state with localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
-    localStorage.setItem('userDetails', JSON.stringify(userDetails));
+    localStorage.setItem('user', JSON.stringify(user));
     localStorage.setItem('orders', JSON.stringify(orders));
-  }, [cartItems, userDetails, orders]);
+  }, [cartItems, user, orders]);
 
   const addToCart = (item) => {
     setCartItems((prevItems) => [...prevItems, item]);
@@ -41,8 +41,8 @@ export const CartProvider = ({ children }) => {
     setCartItems((prevItems) => prevItems.filter(item => item.name !== itemName));
   };
 
-  const updateUserDetails = (details) => {
-    setUserDetails(details);
+  const updateUser = (details) => {
+    setUser(details);
   };
 
   const saveOrder = (orderDetails) => {
@@ -59,11 +59,11 @@ export const CartProvider = ({ children }) => {
       addToCart, 
       clearCart, 
       removeFromCart, 
-      userDetails, 
-      updateUserDetails, 
+      user, 
+      updateUser,  // Updated function name
       orders, 
       saveOrder, 
-      removeOrder // Expose removeOrder to context consumers
+      removeOrder 
     }}>
       {children}
     </CartContext.Provider>

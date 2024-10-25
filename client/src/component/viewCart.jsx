@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from './cartContext';
 
 const ViewCart = () => {
-  const { cartItems, clearCart, removeFromCart } = useCart();
+  const { cartItems, clearCart, removeFromCart, user } = useCart(); // Access user from context
   const navigate = useNavigate();
 
   // Group products by name, color, and size
@@ -24,7 +24,7 @@ const ViewCart = () => {
   const totalPrice = groupedCartItems.reduce((sum, item) => sum + item.totalPrice, 0);
 
   const handleProceedToShipping = () => {
-    navigate('/shipping', { state: { cartItems: groupedCartItems, totalPrice } });
+    navigate('/shipping', { state: { cartItems: groupedCartItems, totalPrice, user } }); // Pass user to shipping
   };
 
   return (

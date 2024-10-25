@@ -40,7 +40,7 @@ const Navigate =useNavigate()
           <ListItemIcon>
             <Profile variant="Bulk" size={18} />
           </ListItemIcon>
-          <ListItemText primary="View Profile" />
+          <ListItemText primary="View Profile" onClick={()=>{Navigate('/profile')}}/>
         </ListItemButton>
         {/* <ListItemButton selected={selectedIndex === 3} onClick={() => handleListItemClick(3)}>
           <ListItemIcon>
@@ -56,7 +56,7 @@ const Navigate =useNavigate()
         </ListItemButton>
       </List>
 
-      {showProfileSettings && <ProfileSettings />} {/* Render ProfileSettings conditionally */}
+      {/* {showProfileSettings && <ProfileSettings />} Render ProfileSettings conditionally */}
     </div>
   );
 }
