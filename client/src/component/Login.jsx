@@ -13,16 +13,17 @@ const Login = () => {
     try {
       const response = await axios.post('http://localhost:8000/api/auth/login', { email, password });
 
-      // Check if the response includes profile details
-      const userDetails = response.data.Detail; // Assuming this contains all the required fields
+      const userDetails = response.data.Detail;
       
       // Store all the user details in localStorage
       localStorage.setItem('user', JSON.stringify(userDetails));
       console.log('User details:', userDetails);
 
+      // Trigger a storage event to inform other tabs/components about the change
+      window.dispatchEvent(new Event("storage"));
+      
       // Navigate to the profile page where all user details will be displayed
       navigate('/');
-
     } catch (error) {
       console.error('Login error:', error);
       setErrorMessage('Login failed. Please check your credentials.');

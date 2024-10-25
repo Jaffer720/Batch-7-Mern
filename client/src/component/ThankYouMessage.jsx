@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Grid, Typography, Box } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const ThankYouMessage = () => {
   const location = useLocation();
-  const { customerDetails, error } = location.state || { customerDetails: {}, error: null };
+  const { error } = location.state || {};
+  const [userDetails, setUserDetails] = useState(null);
+
+  useEffect(() => {
+    // Get the current user details from localStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUserDetails(JSON.parse(storedUser));
+    }
+  }, []);
 
   return (
     <Box
@@ -37,10 +46,10 @@ const ThankYouMessage = () => {
                     Please try again later or contact support.
                   </Typography>
                 </>
-              ) : (
+              ) : userDetails ? (
                 <>
                   <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', textAlign: { xs: 'center', sm: 'left' } }}>
-                    Thank You for Your Purchase, {customerDetails.firstName}!
+                    Thank You for Your Purchase, {userDetails.firstName}!
                   </Typography>
                   <Typography variant="body1" color="textSecondary" sx={{ textAlign: { xs: 'center', sm: 'left' }, marginTop: 2 }}>
                     Your order has been placed successfully.
@@ -49,6 +58,10 @@ const ThankYouMessage = () => {
                     Happy Shopping! 🛒
                   </Typography>
                 </>
+              ) : (
+                <Typography variant="h5" color="textSecondary" sx={{ textAlign: 'center' }}>
+                  Loading user details...
+                </Typography>
               )}
             </Grid>
           </Grid>

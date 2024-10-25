@@ -20,6 +20,7 @@ const orderSchema = new mongoose.Schema({
     date: {
         type: Date,
         required: true,
+        default:new Date()
     },
     total: {
         type: String,
@@ -29,6 +30,7 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['Completed', 'Pending', 'Shipped', 'Cancelled'],
         required: true,
+        default:'Pending'
     },
     items: Array,
 }, { timestamps: true });
