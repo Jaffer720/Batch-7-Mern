@@ -4,8 +4,6 @@ import {
   Box,
   Button,
   IconButton,
-  Menu,
-  MenuItem,
   Modal,
   TextField,
   Typography,
@@ -13,26 +11,21 @@ import {
 import {
   MaterialReactTable,
   useMaterialReactTable,
-  MRT_GlobalFilterTextField,
-  MRT_ToggleFiltersButton,
 } from 'material-react-table';
-import { MoreVert as MoreVertIcon } from '@mui/icons-material';
+import { Edit, Delete } from '@mui/icons-material';
 
 // Backend API URL
 const API_URL = 'http://localhost:8000/api/user/';
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [formValues, setFormValues] = useState({
     firstName: '',
     lastName: '',
-    address: '',
-    city: '',
-    state: '',
+    address: { street: '', city: '', state: '' },
   });
 
   // Fetch users from backend
@@ -55,7 +48,6 @@ const UserTable = () => {
       header: 'Name',
       size: 250,
     },
-    
     {
       accessorKey: 'email',
       header: 'Email',
@@ -82,48 +74,32 @@ const UserTable = () => {
       header: 'Actions',
       size: 150,
       Cell: ({ row }) => (
-        <>
+        <Box display="flex" gap={1}>
           <IconButton
-            onClick={(event) => {
-              setAnchorEl(event.currentTarget);
-              setSelectedUser(row.original);
+            onClick={() => {
+              setFormValues(row.original);
+              setIsEditing(true);
+              setOpenModal(true);
             }}
           >
-            <MoreVertIcon />
+            <Edit />
           </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl) && selectedUser?.firstName === row.original.firstName}
-            onClose={() => setAnchorEl(null)}
+          <IconButton
+            onClick={async () => {
+              try {
+                await axios.delete(`${API_URL}${row.original._id}`);
+                setUsers(users.filter(user => user._id !== row.original._id));
+              } catch (error) {
+                console.error('Error deleting user:', error);
+              }
+            }}
           >
-            <MenuItem
-              onClick={() => {
-                setFormValues(selectedUser);
-                setIsEditing(true);
-                setOpenModal(true);
-                setAnchorEl(null);
-              }}
-            >
-              Edit
-            </MenuItem>
-            <MenuItem
-              onClick={async () => {
-                try {
-                  await axios.delete(`${API_URL}${selectedUser._id}`);
-                  setUsers(users.filter(user => user._id !== selectedUser._id));
-                } catch (error) {
-                  console.error('Error deleting user:', error);
-                }
-                setAnchorEl(null);
-              }}
-            >
-              Delete
-            </MenuItem>
-          </Menu>
-        </>
+            <Delete />
+          </IconButton>
+        </Box>
       ),
     },
-  ], [anchorEl, selectedUser, users]);
+  ], [users]);
 
   const table = useMaterialReactTable({
     columns,
@@ -139,7 +115,7 @@ const UserTable = () => {
 
   const handleAddUser = () => {
     setIsEditing(false);
-    setFormValues({ firstName: '', lastName: '', address: '', city: '', state: '' });
+    setFormValues({ firstName: '', lastName: '', address: { street: '', city: '', state: '' } });
     setOpenModal(true);
   };
 
@@ -207,21 +183,21 @@ const UserTable = () => {
             <TextField
               label="Address"
               value={formValues.address.street}
-              onChange={(e) => setFormValues({ ...formValues, address: e.target.value })}
+              onChange={(e) => setFormValues({ ...formValues, address: { ...formValues.address, street: e.target.value } })}
               fullWidth
               margin="normal"
             />
             <TextField
               label="City"
               value={formValues.address.city}
-              onChange={(e) => setFormValues({ ...formValues, city: e.target.value })}
+              onChange={(e) => setFormValues({ ...formValues, address: { ...formValues.address, city: e.target.value } })}
               fullWidth
               margin="normal"
             />
             <TextField
               label="State"
               value={formValues.address.state}
-              onChange={(e) => setFormValues({ ...formValues, state: e.target.value })}
+              onChange={(e) => setFormValues({ ...formValues, address: { ...formValues.address, state: e.target.value } })}
               fullWidth
               margin="normal"
             />

@@ -3,12 +3,12 @@ import {
   Box,
   Button,
   IconButton,
-  Menu,
-  MenuItem,
   Modal,
   TextField,
   Typography,
   lighten,
+  MenuItem,
+  Menu,
 } from '@mui/material';
 import {
   MaterialReactTable,
@@ -16,8 +16,8 @@ import {
   MRT_GlobalFilterTextField,
   MRT_ToggleFiltersButton,
 } from 'material-react-table';
-import { Api, MoreVert as MoreVertIcon } from '@mui/icons-material';
-import moment from 'moment/moment';
+import { Edit, Delete } from '@mui/icons-material';
+import moment from 'moment';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api/order/';
@@ -34,22 +34,22 @@ const OrderTable = () => {
     total: '',
     status: '',
   });
+
   const getOrders = async () => {
     try {
-      await axios.get(API_URL)
-        .then((res) => setOrders(res.data))
+      const res = await axios.get(API_URL);
+      setOrders(res.data);
+    } catch (err) {
+      console.log('Error fetching orders', err);
     }
-    catch (err) {
-      console.log('error in fething Orders', err)
-    }
-  }
+  };
 
   useEffect(() => {
-    getOrders()
-  }, [])
+    getOrders();
+  }, []);
+
   const columns = useMemo(
     () => [
-
       {
         accessorKey: 'name',
         header: 'Customer Name',
@@ -57,7 +57,7 @@ const OrderTable = () => {
       },
       {
         accessorKey: 'date',
-        accessorFn: (row) => moment(row.date).format('YYYY-MM-DD'), // Correctly accessing the 'date' field
+        accessorFn: (row) => moment(row.date).format('YYYY-MM-DD'),
         header: 'Order Date',
         size: 150,
       },
@@ -76,45 +76,29 @@ const OrderTable = () => {
         header: 'Actions',
         size: 150,
         Cell: ({ row }) => (
-          <>
+          <Box display="flex" gap={1}>
             <IconButton
-              onClick={(event) => {
-                setAnchorEl(event.currentTarget);
-                setSelectedOrder(row.original);
+              onClick={() => {
+                setFormValues(row.original);
+                setIsEditing(true);
+                setOpenModal(true);
               }}
             >
-              <MoreVertIcon />
+              <Edit />
             </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl) && selectedOrder?._id === row.original._id}
-              onClose={() => setAnchorEl(null)}
+            <IconButton
+              onClick={async () => {
+                await axios.delete(`${API_URL}/${row.original._id}`);
+                setOrders(orders.filter(order => order._id !== row.original._id));
+              }}
             >
-              <MenuItem
-                onClick={() => {
-                  setFormValues(selectedOrder);
-                  setIsEditing(true);
-                  setOpenModal(true);
-                  setAnchorEl(null);
-                }}
-              >
-                Edit
-              </MenuItem>
-              <MenuItem
-                onClick={async () => {
-                  await axios.delete(`${API_URL}/${row.original._id}`)
-                  setOrders(orders.filter(order => order._id !== row.original._id));
-                  setAnchorEl(null);
-                }}
-              >
-                Delete
-              </MenuItem>
-            </Menu>
-          </>
+              <Delete />
+            </IconButton>
+          </Box>
         ),
       },
     ],
-    [anchorEl, selectedOrder, orders],
+    [orders]
   );
 
   const table = useMaterialReactTable({
@@ -185,11 +169,11 @@ const OrderTable = () => {
 
   const handleFormSubmit = async () => {
     if (isEditing) {
-      await axios.put(`${API_URL}/${formValues._id}`, formValues)
+      await axios.put(`${API_URL}/${formValues._id}`, formValues);
       setOrders(orders.map(order => (order._id === formValues._id ? formValues : order)));
     } else {
-      await axios.post(API_URL, formValues)
-      const newOrder = { ...formValues };
+      const response = await axios.post(API_URL, formValues);
+      const newOrder = { ...formValues, _id: response.data._id };
       setOrders([...orders, newOrder]);
     }
     setOpenModal(false);
@@ -216,7 +200,7 @@ const OrderTable = () => {
             borderRadius: '8px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
             maxHeight: '600px',
-            overflowY: 'auto'
+            overflowY: 'auto',
           }}
         >
           <Typography variant="h6" gutterBottom>
@@ -227,34 +211,6 @@ const OrderTable = () => {
               label="Customer Name"
               value={formValues.name}
               onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Email"
-              value={formValues.email}
-              onChange={(e) => setFormValues({ ...formValues, email: e.target.value })}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Address"
-              value={formValues.address}
-              onChange={(e) => setFormValues({ ...formValues, address: e.target.value })}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Phone Number"
-              value={formValues.phoneNo}
-              onChange={(e) => setFormValues({ ...formValues, phoneNo: e.target.value })}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Postal Code"
-              value={formValues.postalCode}
-              onChange={(e) => setFormValues({ ...formValues, postalCode: e.target.value })}
               fullWidth
               margin="normal"
             />
@@ -296,7 +252,6 @@ const OrderTable = () => {
               {isEditing ? 'Save Changes' : 'Add Order'}
             </Button>
           </form>
-
         </Box>
       </Modal>
     </Box>

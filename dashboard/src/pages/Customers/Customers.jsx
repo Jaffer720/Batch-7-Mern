@@ -1,10 +1,8 @@
-import React, { useState,useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Button,
   IconButton,
-  Menu,
-  MenuItem,
   Modal,
   TextField,
   Typography,
@@ -16,13 +14,13 @@ import {
   MRT_GlobalFilterTextField,
   MRT_ToggleFiltersButton,
 } from 'material-react-table';
-import { MoreVert as MoreVertIcon } from '@mui/icons-material';
+import { Edit, Delete, Visibility } from '@mui/icons-material';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api/user/';
+
 const UserList = () => {
   const [data, setData] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -35,20 +33,20 @@ const UserList = () => {
     date: '',
     status: '',
   });
- // Fetch users from backend
- useEffect(() => {
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get(API_URL);
-      console.log('response', response.data.users)
-     const customers= response.data.users.filter((data)=>data.roles[0]==="user")
-      setData(customers); // Assuming the API returns an array of users
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
-  fetchUsers();
-}, []);
+
+  // Fetch users from backend
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(API_URL);
+        const customers = response.data.users.filter((data) => data.roles[0] === "user");
+        setData(customers); // Assuming the API returns an array of users
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -58,7 +56,6 @@ const UserList = () => {
         header: 'Name',
         size: 250,
       },
-      
       {
         accessorKey: 'email',
         header: 'Email',
@@ -69,11 +66,6 @@ const UserList = () => {
         header: 'Contact',
         size: 150,
       },
-      // {
-      //   accessorKey: 'roles',
-      //   header: 'Roles',
-      //   size: 150,
-      // },
       {
         accessorFn: (row) => `${row.address.street} ${row.address.city} ${row.address.state}`,
         id: 'address',
@@ -85,52 +77,36 @@ const UserList = () => {
         header: 'Actions',
         size: 150,
         Cell: ({ row }) => (
-          <>
+          <Box display="flex" gap={1}>
             <IconButton
-              onClick={(event) => {
-                setAnchorEl(event.currentTarget);
-                setSelectedUser(row.original);
+              onClick={() => {
+                setFormValues(row.original);
+                setIsEditing(true);
+                setOpenModal(true);
               }}
             >
-              <MoreVertIcon />
+              <Edit />
             </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={() => setAnchorEl(null)}
+            <IconButton
+              onClick={() => {
+                setData(data.filter((user) => user.id !== row.original.id));
+              }}
             >
-              <MenuItem
-                onClick={() => {
-                  setFormValues(selectedUser);
-                  setIsEditing(true);
-                  setOpenModal(true);
-                  setAnchorEl(null);
-                }}
-              >
-                Edit
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setData(data.filter((user) => user.id !== row.original.id));
-                  setAnchorEl(null);
-                }}
-              >
-                Delete
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setOpenDetailModal(true);
-                  setAnchorEl(null);
-                }}
-              >
-                View
-              </MenuItem>
-            </Menu>
-          </>
+              <Delete />
+            </IconButton>
+            <IconButton
+              onClick={() => {
+                setSelectedUser(row.original);
+                setOpenDetailModal(true);
+              }}
+            >
+              <Visibility />
+            </IconButton>
+          </Box>
         ),
       },
     ],
-    [anchorEl, selectedUser, data],
+    [data]
   );
 
   const table = useMaterialReactTable({
@@ -138,7 +114,6 @@ const UserList = () => {
     data,
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
-    enableRowActions: true,
     enableRowSelection: true,
     initialState: {
       showColumnFilters: true,
@@ -228,7 +203,7 @@ const UserList = () => {
       >
         Add New User
       </Button>
-      <Box sx={{ overflowX: 'auto' }}> {/* Wrap table in a scrollable box */}
+      <Box sx={{ overflowX: 'auto' }}>
         <MaterialReactTable table={table} />
       </Box>
 

@@ -11,10 +11,8 @@ import {
 import {
   MaterialReactTable,
   useMaterialReactTable,
-  MRT_GlobalFilterTextField,
-  MRT_ToggleFiltersButton,
 } from 'material-react-table';
-import { MoreVert as MoreVertIcon } from '@mui/icons-material';
+import { Info as InfoIcon } from '@mui/icons-material'; // Import a different icon
 
 // Backend API URL
 const API_URL = 'http://localhost:8000/api/invoice/';
@@ -77,7 +75,7 @@ const InvoiceList = () => {
                 setSelectedInvoice(row.original);
               }}
             >
-              <MoreVertIcon />
+              <InfoIcon /> {/* Replace MoreVertIcon with InfoIcon */}
             </IconButton>
             <Menu
               anchorEl={anchorEl}

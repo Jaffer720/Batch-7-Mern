@@ -20,19 +20,31 @@ import {
 } from '@mui/material';
 import { Edit } from '@mui/icons-material';
 
-
-
 const OrderDetailsModal = ({ open, handleClose, orderDetails }) => {
+  const handleEdit = () => {
+    // Implement edit functionality here
+    console.log("Edit order:", orderDetails.orderNo);
+  };
+
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx={{ 
         width: '95%', 
         height: '95%',  
-         maxWidth: 800, 
-         margin: 'auto', 
-         mt: 5, p: 2 }}>
+        maxWidth: 800, 
+        margin: 'auto', 
+        mt: 5, 
+        p: 2 
+      }}>
         <Card>
-          <CardHeader title="Order Details" />
+          <CardHeader 
+            title="Order Details" 
+            action={
+              <IconButton onClick={handleEdit}>
+                <Edit />
+              </IconButton>
+            }
+          />
           <CardContent>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -52,10 +64,7 @@ const OrderDetailsModal = ({ open, handleClose, orderDetails }) => {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <Card variant="outlined">
-                  <CardHeader
-                    title="Delivery Address"
-                
-                  />
+                  <CardHeader title="Delivery Address" />
                   <CardContent>
                     <Typography>Name: {orderDetails.deliveryAddress.name}</Typography>
                     <Typography>{orderDetails.deliveryAddress.address}</Typography>
@@ -65,10 +74,7 @@ const OrderDetailsModal = ({ open, handleClose, orderDetails }) => {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Card variant="outlined">
-                  <CardHeader
-                    title="Billing Address"
-                   
-                  />
+                  <CardHeader title="Billing Address" />
                   <CardContent>
                     <Typography>Name: {orderDetails.billingAddress.name}</Typography>
                     <Typography>{orderDetails.billingAddress.address}</Typography>

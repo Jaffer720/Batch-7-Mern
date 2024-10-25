@@ -4,8 +4,6 @@ import {
   Box,
   Button,
   IconButton,
-  Menu,
-  MenuItem,
   Modal,
   TextField,
   Typography,
@@ -14,18 +12,17 @@ import {
   InputLabel,
   MenuItem as MuiMenuItem,
 } from '@mui/material';
+import { Edit, Delete, Visibility } from '@mui/icons-material'; // Importing necessary icons
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
-import { MoreVert as MoreVertIcon } from '@mui/icons-material';
 
 // Backend API URL
 const API_URL = 'http://localhost:8000/api/product/';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -48,13 +45,12 @@ const ProductList = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(API_URL);
-        const { products } = response.data
-        console.log('products', products)
-          const processedProducts = products.map(product => {
-            return { ...product,  image : `http://localhost:8000/${product.image}` }
-          })
-        console.log('processedProducts', processedProducts)
-        setProducts(processedProducts); // Assuming data contains the products
+        const { products } = response.data;
+        const processedProducts = products.map(product => ({
+          ...product,
+          image: `http://localhost:8000/${product.image}`,
+        }));
+        setProducts(processedProducts);
       } catch (error) {
         console.error('Error fetching products:', error);
       }
@@ -70,17 +66,15 @@ const ProductList = () => {
         size: 130,
         Cell: ({ row }) => (
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            {/* Assuming row.original.image contains the image URL */}
             <img
-              src={row.original.image} 
-              alt={row.original.name} 
-              style={{ width: '40px', height: '40px', objectFit: 'cover', marginRight: '10px', borderRadius: '5px' }} 
+              src={row.original.image}
+              alt={row.original.name}
+              style={{ width: '40px', height: '40px', objectFit: 'cover', marginRight: '10px', borderRadius: '5px' }}
             />
             <span>{row.original.name}</span>
           </div>
-        )
+        ),
       },
-      
       {
         accessorKey: 'category',
         header: 'Category',
@@ -111,57 +105,41 @@ const ProductList = () => {
         header: 'Actions',
         size: 50,
         Cell: ({ row }) => (
-          <>
+          <Box display="flex" gap={1}>
             <IconButton
-              onClick={(event) => {
-                setAnchorEl(event.currentTarget);
-                setSelectedProduct(row.original);
+              onClick={() => {
+                setFormValues(row.original);
+                setIsEditing(true);
+                setOpenModal(true);
               }}
             >
-              <MoreVertIcon />
+              <Edit />
             </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl) && selectedProduct?._id === row.original._id}
-              onClose={() => setAnchorEl(null)}
+            <IconButton
+              onClick={async () => {
+                try {
+                  await axios.delete(`${API_URL}${row.original._id}`);
+                  setProducts(products.filter(product => product._id !== row.original._id));
+                } catch (error) {
+                  console.error('Error deleting product:', error);
+                }
+              }}
             >
-              <MenuItem
-                onClick={() => {
-                  setFormValues(selectedProduct);
-                  setIsEditing(true);
-                  setOpenModal(true);
-                  setAnchorEl(null);
-                }}
-              >
-                Edit
-              </MenuItem>
-              <MenuItem
-                onClick={async () => {
-                  try {
-                    await axios.delete(`${API_URL}${row.original._id}`);
-                    setProducts(products.filter(product => product._id !== row.original._id));
-                  } catch (error) {
-                    console.error('Error deleting product:', error);
-                  }
-                  setAnchorEl(null);
-                }}
-              >
-                Delete
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setOpenDetailModal(true);
-                  setAnchorEl(null);
-                }}
-              >
-                View
-              </MenuItem>
-            </Menu>
-          </>
+              <Delete />
+            </IconButton>
+            <IconButton
+              onClick={() => {
+                setSelectedProduct(row.original);
+                setOpenDetailModal(true);
+              }}
+            >
+              <Visibility />
+            </IconButton>
+          </Box>
         ),
       },
     ],
-    [anchorEl, selectedProduct, products],
+    [products]
   );
 
   const table = useMaterialReactTable({
@@ -186,24 +164,21 @@ const ProductList = () => {
   };
 
   const handleFormSubmit = async () => {
-    console.log('fromvalues', formValues)
-    const formData = new FormData()
+    const formData = new FormData();
     Object.entries(formValues).forEach(([key, value]) => {
-      formData.append(key, value)
-    })
+      formData.append(key, value);
+    });
 
     if (isEditing) {
-      // Update product via backend
       try {
-        await axios.put(`${API_URL}${formValues._id}`, formValues);
+        await axios.put(`${API_URL}${formValues._id}`, formData);
         setProducts(products.map((product) =>
-          product._id === formValues._id ? formValues : product
+          product._id === formValues._id ? { ...formValues } : product
         ));
       } catch (error) {
         console.error('Error updating product:', error);
       }
     } else {
-      // Add new product via backend
       try {
         const response = await axios.post(API_URL, formData);
         setProducts([...products, response.data.data]);
@@ -211,7 +186,7 @@ const ProductList = () => {
         console.error('Error adding product:', error);
       }
     }
-    // setOpenModal(false);
+    setOpenModal(false);
   };
 
   return (
@@ -297,7 +272,7 @@ const ProductList = () => {
                 margin="normal"
               />
               <TextField
-                label="image"
+                label="Image"
                 type="file"
                 onChange={(e) => setFormValues({ ...formValues, image: e.target.files[0] })}
                 fullWidth
@@ -325,26 +300,33 @@ const ProductList = () => {
         </Box>
       </Modal>
 
-      {/* Detail Modal */}
-      {selectedProduct && (
-        <Modal open={openDetailModal} onClose={() => setOpenDetailModal(false)}>
-          <Box sx={{ padding: 4, backgroundColor: 'white', margin: 'auto', marginTop: '1%', width: 400, borderRadius: '8px' }}>
-            <Typography variant="h6" gutterBottom>
-              Product Details
-            </Typography>
-            <Typography>Name: {selectedProduct.name}</Typography>
-            <Typography>Category: {selectedProduct.category}</Typography>
-            <Typography>Sub-Category: {selectedProduct.subCategory}</Typography>
-            <Typography>Size: {selectedProduct.size}</Typography>
-            <Typography>Color: {selectedProduct.color}</Typography>
-            <Typography>Price: {selectedProduct.price}</Typography>
-            <Typography>Stock: {selectedProduct.stock}</Typography>
-            <Button variant="contained" color="primary" sx={{ marginTop: 2 }} onClick={() => setOpenDetailModal(false)}>
-              Close
-            </Button>
-          </Box>
-        </Modal>
-      )}
+     {/* Detail Modal */}
+{selectedProduct && (
+  <Modal open={openDetailModal} onClose={() => setOpenDetailModal(false)}>
+    <Box sx={{ padding: 4, backgroundColor: 'white', margin: 'auto', marginTop: '1%', width: 400, borderRadius: '8px' }}>
+      <Typography variant="h6" gutterBottom>
+        Product Details
+      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+        <img
+          src={selectedProduct.image} // Display the product image
+          alt={selectedProduct.name}
+          style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '5px', marginRight: '10px' }}
+        />
+        <Typography variant="body1">{selectedProduct.name}</Typography>
+      </Box>
+      <Typography>Category: {selectedProduct.category}</Typography>
+      <Typography>Sub-Category: {selectedProduct.subCategory}</Typography>
+      <Typography>Size: {selectedProduct.size}</Typography>
+      <Typography>Color: {selectedProduct.color}</Typography>
+      <Typography>Price: {selectedProduct.price}</Typography>
+      <Typography>Stock: {selectedProduct.stock}</Typography>
+      <Button variant="contained" color="primary" sx={{ marginTop: 2 }} onClick={() => setOpenDetailModal(false)}>
+        Close
+      </Button>
+    </Box>
+  </Modal>
+)}
     </Box>
   );
 };
