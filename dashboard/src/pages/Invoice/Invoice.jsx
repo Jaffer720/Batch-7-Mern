@@ -46,11 +46,6 @@ const InvoiceList = () => {
         size: 100,
       },
       {
-        accessorKey: 'Items',
-        header: 'Items',
-        size: 100,
-      },
-      {
         accessorKey: 'customer.email', // Use a specific field of customer
         header: 'Customer Email',
         size: 200,
@@ -150,14 +145,14 @@ const InvoiceList = () => {
           </Typography>
           <Typography>Invoice Number: {selectedInvoice?.invoiceNumber}</Typography>
           <Typography>Issue Date: {selectedInvoice?.issueDate}</Typography>
-          <Typography>Due Date: {selectedInvoice?.dueDate}</Typography>
+          {/* <Typography>Due Date: {selectedInvoice?.dueDate}</Typography> */}
           <Typography>
             Customer Email: {selectedInvoice?.customer?.email || 'N/A'}
           </Typography>
           <Typography>
             Customer ID: {selectedInvoice?.customer?._id || 'N/A'}
           </Typography>
-          <Typography>Items: {selectedInvoice?.items?.join(', ')}</Typography>
+          <Typography>Items: {selectedInvoice?.items?.}</Typography>
           <Typography>Quantities: {selectedInvoice?.quantities?.join(', ')}</Typography>
           <Typography>Subtotal: {selectedInvoice?.subtotal}</Typography>
           <Typography>Total: {selectedInvoice?.total}</Typography>
