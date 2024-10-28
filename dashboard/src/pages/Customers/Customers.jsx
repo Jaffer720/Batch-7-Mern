@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
-  Button,
   IconButton,
   Modal,
-  TextField,
   Typography,
-  lighten,
 } from '@mui/material';
 import {
   MaterialReactTable,
@@ -14,7 +11,7 @@ import {
   MRT_GlobalFilterTextField,
   MRT_ToggleFiltersButton,
 } from 'material-react-table';
-import { Edit, Delete, Visibility } from '@mui/icons-material';
+import { Delete, Visibility } from '@mui/icons-material';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api/user/';
@@ -22,17 +19,7 @@ const API_URL = 'http://localhost:8000/api/user/';
 const UserList = () => {
   const [data, setData] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
   const [openDetailModal, setOpenDetailModal] = useState(false);
-  const [formValues, setFormValues] = useState({
-    id: '',
-    fullname: '',
-    email: '',
-    country: '',
-    date: '',
-    status: '',
-  });
 
   // Fetch users from backend
   useEffect(() => {
@@ -40,7 +27,7 @@ const UserList = () => {
       try {
         const response = await axios.get(API_URL);
         const customers = response.data.users.filter((data) => data.roles[0] === "user");
-        setData(customers); // Assuming the API returns an array of users
+        setData(customers);
       } catch (error) {
         console.error('Error fetching users:', error);
       }
@@ -80,12 +67,11 @@ const UserList = () => {
           <Box display="flex" gap={1}>
             <IconButton
               onClick={() => {
-                setFormValues(row.original);
-                setIsEditing(true);
-                setOpenModal(true);
+                setSelectedUser(row.original);
+                setOpenDetailModal(true);
               }}
             >
-              <Edit />
+              <Visibility />
             </IconButton>
             <IconButton
               onClick={() => {
@@ -93,14 +79,6 @@ const UserList = () => {
               }}
             >
               <Delete />
-            </IconButton>
-            <IconButton
-              onClick={() => {
-                setSelectedUser(row.original);
-                setOpenDetailModal(true);
-              }}
-            >
-              <Visibility />
             </IconButton>
           </Box>
         ),
@@ -155,7 +133,6 @@ const UserList = () => {
       return (
         <Box
           sx={(theme) => ({
-            backgroundColor: lighten(theme.palette.background.default, 0.05),
             display: 'flex',
             gap: '0.5rem',
             p: '8px',
@@ -171,108 +148,11 @@ const UserList = () => {
     },
   });
 
-  const handleAddUser = () => {
-    setIsEditing(false);
-    setFormValues({
-      id: '',
-      fullname: '',
-      email: '',
-      country: '',
-      date: '',
-      status: '',
-    });
-    setOpenModal(true);
-  };
-
-  const handleFormSubmit = () => {
-    if (isEditing) {
-      setData(data.map((user) => (user.id === formValues.id ? formValues : user)));
-    } else {
-      setData([...data, formValues]);
-    }
-    setOpenModal(false);
-  };
-
   return (
     <Box sx={{ padding: 4, backgroundColor: '#f0f2f5', maxWidth: '100%' }}>
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{ marginBottom: 2 }}
-        onClick={handleAddUser}
-      >
-        Add New User
-      </Button>
       <Box sx={{ overflowX: 'auto' }}>
         <MaterialReactTable table={table} />
       </Box>
-
-      <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Box
-          sx={{
-            padding: 4,
-            backgroundColor: 'white',
-            margin: 'auto',
-            marginTop: '1%',
-            width: 400,
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            {isEditing ? 'Edit User' : 'Add New User'}
-          </Typography>
-          <form>
-            <TextField
-              label="ID"
-              value={formValues.id}
-              onChange={(e) => setFormValues({ ...formValues, id: e.target.value })}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Fullname"
-              value={formValues.fullname}
-              onChange={(e) => setFormValues({ ...formValues, fullname: e.target.value })}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Email"
-              value={formValues.email}
-              onChange={(e) => setFormValues({ ...formValues, email: e.target.value })}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Country"
-              value={formValues.country}
-              onChange={(e) => setFormValues({ ...formValues, country: e.target.value })}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Date"
-              value={formValues.date}
-              onChange={(e) => setFormValues({ ...formValues, date: e.target.value })}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Status"
-              value={formValues.status}
-              onChange={(e) => setFormValues({ ...formValues, status: e.target.value })}
-              fullWidth
-              margin="normal"
-            />
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
-              <Button onClick={handleFormSubmit} variant="contained" color="primary">
-                {isEditing ? 'Save Changes' : 'Add User'}
-              </Button>
-            </Box>
-          </form>
-        </Box>
-      </Modal>
 
       <Modal open={openDetailModal} onClose={() => setOpenDetailModal(false)}>
         <Box
@@ -289,12 +169,14 @@ const UserList = () => {
           <Typography variant="h6" gutterBottom>
             User Details
           </Typography>
-          <Typography>ID: {selectedUser?.id}</Typography>
-          <Typography>Fullname: {selectedUser?.fullname}</Typography>
-          <Typography>Email: {selectedUser?.email}</Typography>
-          <Typography>Country: {selectedUser?.country}</Typography>
-          <Typography>Date: {selectedUser?.date}</Typography>
-          <Typography>Status: {selectedUser?.status}</Typography>
+          <Typography><strong>ID:</strong> {selectedUser?.customer?.id}</Typography>
+          <Typography><strong>Fullname:</strong> {selectedUser?.name}</Typography>
+          <Typography><strong>Email:</strong> {selectedUser?.email}</Typography>
+          <Typography><strong>Contact:</strong> {selectedUser?.phone}</Typography>
+          <Typography><strong>Country:</strong> {selectedUser?.country}</Typography>
+          <Typography><strong>Address:</strong> {selectedUser?.address ? `${selectedUser.address.street}, ${selectedUser.address.city}, ${selectedUser.address.state}` : 'N/A'}</Typography>
+          <Typography><strong>Date:</strong> {selectedUser?.date}</Typography>
+          <Typography><strong>Status:</strong> {selectedUser?.status}</Typography>
         </Box>
       </Modal>
     </Box>
@@ -302,3 +184,4 @@ const UserList = () => {
 };
 
 export default UserList;
+  

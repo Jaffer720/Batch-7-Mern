@@ -43,11 +43,11 @@ const InvoiceList = () => {
         header: 'Invoice Number',
         size: 100,
       },
-      {
-        accessorKey: 'Items',
-        header: 'Items',
-        size: 100,
-      },
+      // {
+      //   accessorKey: 'Items',
+      //   header: 'Items',
+      //   size: 100,
+      // },
       {
         accessorKey: 'customer.email', // Use a specific field of customer
         header: 'Customer Email',

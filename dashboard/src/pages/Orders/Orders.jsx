@@ -1,14 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
-  Button,
   IconButton,
   Modal,
   TextField,
   Typography,
-  lighten,
   MenuItem,
-  Menu,
 } from '@mui/material';
 import {
   MaterialReactTable,
@@ -16,7 +13,7 @@ import {
   MRT_GlobalFilterTextField,
   MRT_ToggleFiltersButton,
 } from 'material-react-table';
-import { Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete, Visibility } from '@mui/icons-material';
 import moment from 'moment';
 import axios from 'axios';
 
@@ -24,10 +21,10 @@ const API_URL = 'http://localhost:8000/api/order/';
 
 const OrderTable = () => {
   const [orders, setOrders] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [openViewModal, setOpenViewModal] = useState(false);
   const [formValues, setFormValues] = useState({
     name: '',
     date: moment(Date.now()).format('YYYY-MM-DD'),
@@ -94,6 +91,14 @@ const OrderTable = () => {
             >
               <Delete />
             </IconButton>
+            <IconButton
+              onClick={() => {
+                setSelectedOrder(row.original);
+                setOpenViewModal(true);
+              }}
+            >
+              <Visibility />
+            </IconButton>
           </Box>
         ),
       },
@@ -111,61 +116,7 @@ const OrderTable = () => {
       showColumnFilters: true,
       showGlobalFilter: true,
     },
-    muiTableBodyCellProps: {
-      sx: {
-        backgroundColor: '#f5f5f5',
-        borderBottom: '1px solid #e0e0e0',
-      },
-    },
-    muiTableBodyRowProps: {
-      sx: {
-        '&:nth-of-type(odd)': {
-          backgroundColor: '#ffffff',
-        },
-        '&:hover': {
-          backgroundColor: '#f1f1f1',
-        },
-      },
-    },
-    muiTableHeadCellProps: {
-      sx: {
-        backgroundColor: '#ffffff',
-        color: '#000000',
-        fontWeight: 'bold',
-        textTransform: 'uppercase',
-      },
-    },
-    muiTableContainerProps: {
-      sx: {
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        borderRadius: '8px',
-        overflow: 'auto',
-        maxWidth: '100%',
-      },
-    },
-    renderTopToolbar: ({ table }) => (
-      <Box
-        sx={(theme) => ({
-          backgroundColor: lighten(theme.palette.background.default, 0.05),
-          display: 'flex',
-          gap: '0.5rem',
-          p: '8px',
-          justifyContent: 'space-between',
-        })}
-      >
-        <Box sx={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <MRT_GlobalFilterTextField table={table} />
-          <MRT_ToggleFiltersButton table={table} />
-        </Box>
-      </Box>
-    ),
   });
-
-  const handleAddOrder = () => {
-    setIsEditing(false);
-    setFormValues({ name: '', date: '', total: '', status: '' });
-    setOpenModal(true);
-  };
 
   const handleFormSubmit = async () => {
     if (isEditing) {
@@ -181,9 +132,6 @@ const OrderTable = () => {
 
   return (
     <Box sx={{ padding: 4, backgroundColor: '#f0f2f5' }}>
-      <Button variant="contained" color="primary" sx={{ marginBottom: 2 }} onClick={handleAddOrder}>
-        Add New Order
-      </Button>
       <Box sx={{ overflowX: 'auto' }}>
         <MaterialReactTable table={table} />
       </Box>
@@ -248,10 +196,39 @@ const OrderTable = () => {
               <MenuItem value="Shipped">Shipped</MenuItem>
               <MenuItem value="Cancelled">Cancelled</MenuItem>
             </TextField>
-            <Button variant="contained" color="primary" sx={{ marginTop: 2 }} onClick={handleFormSubmit}>
+            <IconButton variant="contained" sx={{ marginTop: 2 }} onClick={handleFormSubmit}>
               {isEditing ? 'Save Changes' : 'Add Order'}
-            </Button>
+            </IconButton>
           </form>
+        </Box>
+      </Modal>
+
+      {/* Modal for Viewing Order Details */}
+      <Modal open={openViewModal} onClose={() => setOpenViewModal(false)}>
+        <Box
+          sx={{
+            padding: 4,
+            backgroundColor: 'white',
+            margin: 'auto',
+            marginTop: '1%',
+            width: 400,
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            maxHeight: '600px',
+            overflowY: 'auto',
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            Order Details
+          </Typography>
+          {selectedOrder && (
+            <>
+              <Typography><strong>Customer Name:</strong> {selectedOrder.name}</Typography>
+              <Typography><strong>Order Date:</strong> {moment(selectedOrder.date).format('YYYY-MM-DD')}</Typography>
+              <Typography><strong>Total Amount:</strong> {selectedOrder.total}</Typography>
+              <Typography><strong>Order Status:</strong> {selectedOrder.status}</Typography>
+            </>
+          )}
         </Box>
       </Modal>
     </Box>

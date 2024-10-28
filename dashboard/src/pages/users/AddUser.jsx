@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import axios from 'axios';
 import {
   Box,
-  Button,
   IconButton,
   Modal,
   TextField,
@@ -19,7 +18,6 @@ const API_URL = 'http://localhost:8000/api/user/';
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [formValues, setFormValues] = useState({
@@ -113,12 +111,6 @@ const UserTable = () => {
     enableColumnFilterModes: false,
   });
 
-  const handleAddUser = () => {
-    setIsEditing(false);
-    setFormValues({ firstName: '', lastName: '', address: { street: '', city: '', state: '' } });
-    setOpenModal(true);
-  };
-
   const handleFormSubmit = async () => {
     if (isEditing) {
       // Update user via backend
@@ -142,9 +134,6 @@ const UserTable = () => {
 
   return (
     <Box sx={{ padding: 4, backgroundColor: '#f0f2f5' }}>
-      <Button variant="contained" color="primary" sx={{ marginBottom: 2 }} onClick={handleAddUser}>
-        Add New User
-      </Button>
       <Box sx={{ overflowX: 'auto' }}>
         <MaterialReactTable table={table} />
       </Box>
@@ -201,9 +190,9 @@ const UserTable = () => {
               fullWidth
               margin="normal"
             />
-            <Button variant="contained" color="primary" sx={{ marginTop: 2 }} onClick={handleFormSubmit}>
+            {/* <Button variant="contained" sx={{ marginTop: 2 }} onClick={handleFormSubmit}>
               {isEditing ? 'Save Changes' : 'Add User'}
-            </Button>
+            </Button> */}
           </form>
         </Box>
       </Modal>
