@@ -3,25 +3,26 @@ import axios from 'axios';
 import {
   Box,
   IconButton,
-  Menu,
-  MenuItem,
   Modal,
   Typography,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
-import { Info as InfoIcon } from '@mui/icons-material'; // Import a different icon
+import { Delete as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 
 // Backend API URL
-const API_URL = 'http://localhost:8000/api/invoice/';
+const API_URL = 'http://localhost:8000/api/Invoice/';
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   // Fetch invoices from backend
   useEffect(() => {
@@ -36,6 +37,22 @@ const InvoiceList = () => {
     fetchInvoices();
   }, []);
 
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this invoice?');
+    if (confirmDelete) {
+      try {
+        await axios.delete(`${API_URL}${id}`);
+        setInvoices(invoices.filter(invoice => invoice._id !== id));
+        setSnackbarMessage('Invoice deleted successfully.');
+        setOpenSnackbar(true);
+      } catch (error) {
+        console.error('Error deleting invoice:', error);
+        setSnackbarMessage('Failed to delete invoice.');
+        setOpenSnackbar(true);
+      }
+    }
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -43,13 +60,8 @@ const InvoiceList = () => {
         header: 'Invoice Number',
         size: 100,
       },
-      // {
-      //   accessorKey: 'Items',
-      //   header: 'Items',
-      //   size: 100,
-      // },
       {
-        accessorKey: 'customer.email', // Use a specific field of customer
+        accessorKey: 'customer.email',
         header: 'Customer Email',
         size: 200,
       },
@@ -68,47 +80,31 @@ const InvoiceList = () => {
         header: 'Actions',
         size: 150,
         Cell: ({ row }) => (
-          <>
+          <Box>
             <IconButton
-              onClick={(event) => {
-                setAnchorEl(event.currentTarget);
+              onClick={() => {
+                setOpenDetailModal(true);
                 setSelectedInvoice(row.original);
               }}
+              size="medium"
+              sx={{ color: 'grey' }} // Set the color for the View icon
+              title="View Invoice"
             >
-              <InfoIcon /> {/* Replace MoreVertIcon with InfoIcon */}
+              <VisibilityIcon />
             </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl) && selectedInvoice?.invoiceNumber === row.original.invoiceNumber}
-              onClose={() => setAnchorEl(null)}
+            <IconButton
+              onClick={() => handleDelete(row.original._id)} // Call handleDelete on click
+              size="medium"
+              sx={{ color: 'grey' }} // Set the color for the Delete icon
+              title="Delete Invoice"
             >
-              <MenuItem
-                onClick={async () => {
-                  try {
-                    await axios.delete(`${API_URL}${row.original.invoiceNumber}`);
-                    setInvoices(invoices.filter(invoice => invoice.invoiceNumber !== row.original.invoiceNumber));
-                  } catch (error) {
-                    console.error('Error deleting invoice:', error);
-                  }
-                  setAnchorEl(null);
-                }}
-              >
-                Delete
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setOpenDetailModal(true);
-                  setAnchorEl(null);
-                }}
-              >
-                View
-              </MenuItem>
-            </Menu>
-          </>
+              <DeleteIcon />
+            </IconButton>
+          </Box>
         ),
       },
     ],
-    [anchorEl, selectedInvoice, invoices],
+    [invoices],
   );
 
   const table = useMaterialReactTable({
@@ -163,6 +159,18 @@ const InvoiceList = () => {
           <Typography>Notes: {selectedInvoice?.notes}</Typography>
         </Box>
       </Modal>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity="success">
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
