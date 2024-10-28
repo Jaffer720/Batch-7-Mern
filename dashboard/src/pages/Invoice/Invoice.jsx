@@ -150,12 +150,11 @@ const InvoiceList = () => {
           <Typography>
             Customer ID: {selectedInvoice?.customer?._id || 'N/A'}
           </Typography>
-          <Typography>Items: {selectedInvoice?.items?.}</Typography>
+          <Typography>Items: {selectedInvoice?.items?.product}</Typography>
           <Typography>Quantities: {selectedInvoice?.quantities?.join(', ')}</Typography>
-          <Typography>Subtotal: {selectedInvoice?.subtotal}</Typography>
           <Typography>Total: {selectedInvoice?.total}</Typography>
           <Typography>Payment Status: {selectedInvoice?.paymentStatus}</Typography>
-          <Typography>Notes: {selectedInvoice?.notes}</Typography>
+         
         </Box>
       </Modal>
     </Box>
