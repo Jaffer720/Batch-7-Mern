@@ -30,7 +30,7 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
     localStorage.setItem('wishlist', JSON.stringify(wishlist)); // Save wishlist to localStorage
-    localStorage.setItem('user', JSON.stringify(user));
+    // localStorage.setItem('user', JSON.stringify(user));
     localStorage.setItem('orders', JSON.stringify(orders));
   }, [cartItems, wishlist, user, orders]);
 

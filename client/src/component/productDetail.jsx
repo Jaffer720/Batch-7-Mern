@@ -46,12 +46,10 @@ export const ProductDetail = () => {
   // Handle Add to Cart logic
   const handleAddToCart = () => {
     if (productDetails) {
-      const imageUrl = productDetails.images && productDetails.images.length > 0
-        ? productDetails.images[0]  // Select the first image
-        : productDetails.imageUrl;
-
+     
+  
       addToCart({
-        image: imageUrl,
+        image:productDetails.image, // Ensure the image URL is passed
         category,
         subCategory,
         color,
@@ -62,12 +60,12 @@ export const ProductDetail = () => {
         _id: id,
         quantity: 1
       });
-
+  
       setCartOpen(true);
       setSuccessMessage(true);
     }
   };
-
+  
   // Handle Add to Wishlist logic
   const handleWishlistToggle = () => {
     if (inWishlist) {
@@ -80,7 +78,7 @@ export const ProductDetail = () => {
         category,
         subCategory,
         brand: productDetails.brand,
-        image: productDetails.images?.[0] || productDetails.imageUrl // Use the first image or fallback
+        image: productDetails.image?.[0] || productDetails.imageUrl // Use the first image or fallback
       });
     }
     setInWishlist(!inWishlist); // Toggle wishlist state
@@ -215,7 +213,7 @@ export const ProductDetail = () => {
               {/* Display Image */}
               <Grid item container justifyContent="center">
                 <img
-                  src={productDetails.images?.[0] || productDetails.imageUrl} // Use the first image or fallback
+                  src={productDetails.image} // Use the first image or fallback
                   alt="product"
                   width="80"
                   style={{ borderRadius: '5%' }}
