@@ -4,16 +4,14 @@ import {
   Button,
   IconButton,
   Modal,
+  Menu,
+  MenuItem,
   TextField,
   Typography,
-  lighten,
 } from '@mui/material';
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from 'material-react-table';
-import { Api, MoreVert as MoreVertIcon } from '@mui/icons-material';
-import moment from 'moment/moment';
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
+import { Edit, MoreVert as MoreVertIcon } from '@mui/icons-material';
+import moment from 'moment';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api/order/';
@@ -30,15 +28,18 @@ const OrderTable = () => {
     date: moment(Date.now()).format('YYYY-MM-DD'),
     total: '',
     status: '',
+    email: '',
+    address: '',
+    phoneNo: '',
+    postalCode: '',
   });
 
   const getOrders = async () => {
     try {
-      await axios.get(API_URL)
-        .then((res) => setOrders(res.data))
-    }
-    catch (err) {
-      console.log('error in fething Orders', err)
+      const res = await axios.get(API_URL);
+      setOrders(res.data);
+    } catch (err) {
+      console.log('Error fetching orders', err);
     }
   };
 
@@ -48,18 +49,8 @@ const OrderTable = () => {
 
   const columns = useMemo(
     () => [
-
-      {
-        accessorKey: 'name',
-        header: 'Customer Name',
-        size: 250,
-      },
-      {
-        accessorKey: 'date',
-        accessorFn: (row) => moment(row.date).format('YYYY-MM-DD'),
-        header: 'Order Date',
-        size: 150,
-      },
+      { accessorKey: 'name', header: 'Customer Name', size: 250 },
+      { accessorKey: 'date', header: 'Order Date', size: 150, accessorFn: row => moment(row.date).format('YYYY-MM-DD') },
       { accessorKey: 'total', header: 'Total Amount', size: 150 },
       { accessorKey: 'status', header: 'Order Status', size: 150 },
       {
@@ -76,6 +67,14 @@ const OrderTable = () => {
               }}
             >
               <Edit />
+            </IconButton>
+            <IconButton
+              onClick={(e) => {
+                setAnchorEl(e.currentTarget);
+                setSelectedOrder(row.original);
+              }}
+            >
+              <MoreVertIcon />
             </IconButton>
             <Menu
               anchorEl={anchorEl}
@@ -94,7 +93,7 @@ const OrderTable = () => {
               </MenuItem>
               <MenuItem
                 onClick={async () => {
-                  await axios.delete(`${API_URL}/${row.original._id}`)
+                  await axios.delete(`${API_URL}/${row.original._id}`);
                   setOrders(orders.filter(order => order._id !== row.original._id));
                   setAnchorEl(null);
                 }}
@@ -102,11 +101,11 @@ const OrderTable = () => {
                 Delete
               </MenuItem>
             </Menu>
-          </>
+          </Box>
         ),
       },
     ],
-    [anchorEl, selectedOrder, orders],
+    [anchorEl, selectedOrder, orders]
   );
 
   const table = useMaterialReactTable({
@@ -120,18 +119,17 @@ const OrderTable = () => {
 
   const handleFormSubmit = async () => {
     if (isEditing) {
-      await axios.put(`${API_URL}/${formValues._id}`, formValues)
+      await axios.put(`${API_URL}/${formValues._id}`, formValues);
       setOrders(orders.map(order => (order._id === formValues._id ? formValues : order)));
     } else {
-      await axios.post(API_URL, formValues)
-      const newOrder = { ...formValues };
-      setOrders([...orders, newOrder]);
+      const res = await axios.post(API_URL, formValues);
+      setOrders([...orders, res.data]);
     }
     setOpenModal(false);
   };
 
   return (
-    <Box sx={{ padding: 4, backgroundColor: '#f0f2f5' }}>
+    <Box sx={{ padding: 4, backgroundColor: '#f0f2f5' , height: '300'}}>
       <Button
         variant="contained"
         color="primary"
@@ -164,28 +162,14 @@ const OrderTable = () => {
           </Typography>
           {selectedOrder && (
             <>
-              <Typography variant="body1">
-                Customer Name: {selectedOrder.name}
-              </Typography>
+              <Typography variant="body1">Customer Name: {selectedOrder.name}</Typography>
               <Typography variant="body1">Email: {selectedOrder.email}</Typography>
-              <Typography variant="body1">
-                Address: {selectedOrder.address}
-              </Typography>
-              <Typography variant="body1">
-                Phone Number: {selectedOrder.phoneNo}
-              </Typography>
-              <Typography variant="body1">
-                Postal Code: {selectedOrder.postalCode}
-              </Typography>
-              <Typography variant="body1">
-                Order Date: {moment(selectedOrder.date).format('YYYY-MM-DD')}
-              </Typography>
-              <Typography variant="body1">
-                Total Amount: {selectedOrder.total}
-              </Typography>
-              <Typography variant="body1">
-                Order Status: {selectedOrder.status}
-              </Typography>
+              <Typography variant="body1">Address: {selectedOrder.address}</Typography>
+              <Typography variant="body1">Phone Number: {selectedOrder.phoneNo}</Typography>
+              <Typography variant="body1">Postal Code: {selectedOrder.postalCode}</Typography>
+              <Typography variant="body1">Order Date: {moment(selectedOrder.date).format('YYYY-MM-DD')}</Typography>
+              <Typography variant="body1">Total Amount: {selectedOrder.total}</Typography>
+              <Typography variant="body1">Order Status: {selectedOrder.status}</Typography>
             </>
           )}
         </Box>
@@ -213,9 +197,7 @@ const OrderTable = () => {
             <TextField
               label="Customer Name"
               value={formValues.name}
-              onChange={(e) =>
-                setFormValues({ ...formValues, name: e.target.value })
-              }
+              onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
               fullWidth
               margin="normal"
             />
@@ -281,8 +263,8 @@ const OrderTable = () => {
               <MenuItem value="Shipped">Shipped</MenuItem>
               <MenuItem value="Cancelled">Cancelled</MenuItem>
             </TextField>
-            <Button variant="contained" color="primary" sx={{ marginTop: 2 }} onClick={handleFormSubmit}>
-              {isEditing ? 'Save Changes' : 'Add Order'}
+            <Button variant="contained" color="primary" fullWidth onClick={handleFormSubmit}>
+              {isEditing ? 'Update Order' : 'Add Order'}
             </Button>
           </form>
         </Box>
