@@ -1,6 +1,7 @@
 import Order from '../model/order.model.js';
 import Invoice from '../model/invoice.model.js';
 import User from '../model/user.model.js';
+
 // Get all orders
 export const getOrders = async (req, res) => {
     try {
@@ -25,36 +26,46 @@ export const getOrderById = async (req, res) => {
 // Create a new order
 export const createOrder = async (req, res) => {
     const { id } = req.params; // User ID from params
-    const { name, email, address, phoneNo,  } = req.body.customerDetails
+    const { shippingDetails, items, total, user } = req.body;
+
+    // Validate input
+    if (!shippingDetails || !items || !total) {
+        return res.status(400).json({ message: "Customer details, items, and total are required." });
+    }
+
+    const { city, country, postalCode, state, street } = shippingDetails;
+    const { firstName, lastName, email, phone } = user
+
     try {
         // 1. Create a new Order
         const newOrder = new Order({
-            name:name,
-            email:email,
-            items:req.body.items,
-            total:req.body.total
+            name: `${firstName} ${lastName}`,
+            email,
+            address: `${street} ${city}, ${state}, ${country}`,
+            phoneNo: phone,
+            postalCode,
+            items,
+            total
         });
         await newOrder.save();
 
         // 2. Create an Invoice for the new Order
         const newInvoice = new Invoice({
-            invoiceNumber: generateInvoiceNumber(), // You might want to implement a function to generate this
+            invoiceNumber: generateInvoiceNumber(),
             issueDate: Date.now(),
-            customer: id, // Referencing the user ID
-            items: req.body.items, // Assuming you have items in the request body
-            // quantities: req.body.quantities, // Assuming quantities are sent in the request body
-            // subtotal: req.body.subtotal, // Assuming subtotal is calculated beforehand
-            total: req.body.total, // Assuming total is calculated
-            paymentStatus: req.body.paymentStatus || "pending", // Default to "pending"
-            notes: req.body.notes || "", // Optional notes
+            customer: id,
+            items: items.map((item) => { return item._id }), // Assuming you have items in the request body
+            total,
+            // paymentStatus: "pending", // Default to "pending"
+            // notes: "", // Optional notes
         });
         await newInvoice.save();
 
         // 3. Update the user by pushing the new order to the user's "Orders" array
         const updatedUser = await User.findByIdAndUpdate(
             id,
-            { $push: { Orders: newOrder } }, // Add the new order to the Orders array
-            { new: true } // Return the updated user document
+            { $push: { Orders: newOrder } },
+            { new: true }
         );
 
         if (!updatedUser) {
@@ -64,7 +75,7 @@ export const createOrder = async (req, res) => {
         // 4. Respond with the new order and invoice
         res.status(201).json({ order: newOrder, invoice: newInvoice });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 

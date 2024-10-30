@@ -15,7 +15,7 @@ import Footer from './component/footer';
 import Profile from './component/profile';
 import Layout from './component/Layout';
 import MyOrder from './component/myOrder';
-
+import Wishlist from './component/Wishlist'; // Import the Wishlist component
 
 const App = () => {
   return (
@@ -25,6 +25,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/*" element={<Layout />}>
+
             <Route index element={<LandingPage />} />
             <Route path="home" element={<LandingPage />} />
             <Route path="productDetail" element={<ProductDetail />} />
@@ -36,6 +37,7 @@ const App = () => {
             <Route path="contact" element={<ProductList />} />
             <Route path="profile" element={<Profile />} />
             <Route path="myOrder" element={<MyOrder />} />
+            <Route path="wishlist" element={<Wishlist />} /> {/* Add Wishlist Route */}
           </Route>
         </Routes>
       </Router>

@@ -1,3 +1,4 @@
+// InvoiceList.js
 import React, { useState, useMemo, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -8,20 +9,28 @@ import {
   Modal,
   Typography,
 } from '@mui/material';
+<<<<<<< HEAD
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
 import { Info as InfoIcon } from '@mui/icons-material'; // Import a different icon
+=======
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
+import { MoreVert as MoreVertIcon } from '@mui/icons-material';
+import EditInvoice from './EditInvoice'; // Import the new EditInvoice component
+import { BASEURL } from '../URL';
+>>>>>>> iftikhar
 
 // Backend API URL
-const API_URL = 'http://localhost:8000/api/invoice/';
+const API_URL = `${BASEURL}/api/invoice/`;
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   // Fetch invoices from backend
   useEffect(() => {
@@ -35,6 +44,12 @@ const InvoiceList = () => {
     };
     fetchInvoices();
   }, []);
+
+  const handleUpdateInvoice = (updatedInvoice) => {
+    setInvoices((prev) =>
+      prev.map((invoice) => (invoice.invoiceNumber === updatedInvoice.invoiceNumber ? updatedInvoice : invoice))
+    );
+  };
 
   const columns = useMemo(
     () => [
@@ -78,6 +93,22 @@ const InvoiceList = () => {
               onClose={() => setAnchorEl(null)}
             >
               <MenuItem
+                onClick={() => {
+                  setOpenEditModal(true);
+                  setAnchorEl(null);
+                }}
+              >
+                Edit
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setOpenDetailModal(true);
+                  setAnchorEl(null);
+                }}
+              >
+                View
+              </MenuItem>
+              <MenuItem
                 onClick={async () => {
                   try {
                     await axios.delete(`${API_URL}${row.original.invoiceNumber}`);
@@ -90,20 +121,12 @@ const InvoiceList = () => {
               >
                 Delete
               </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setOpenDetailModal(true);
-                  setAnchorEl(null);
-                }}
-              >
-                View
-              </MenuItem>
             </Menu>
           </>
         ),
       },
     ],
-    [anchorEl, selectedInvoice, invoices],
+    [anchorEl, selectedInvoice, invoices]
   );
 
   const table = useMaterialReactTable({
@@ -127,6 +150,7 @@ const InvoiceList = () => {
 
       {/* Detail Modal */}
       <Modal open={openDetailModal} onClose={() => setOpenDetailModal(false)}>
+<<<<<<< HEAD
         <Box
           sx={{
             padding: 4,
@@ -141,6 +165,10 @@ const InvoiceList = () => {
           <Typography variant="h6" gutterBottom>
             Invoice Details
           </Typography>
+=======
+        <Box sx={{ padding: 4, backgroundColor: 'white', margin: 'auto', marginTop: '1%', width: 400, borderRadius: '8px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h6" gutterBottom>Invoice Details</Typography>
+>>>>>>> iftikhar
           <Typography>Invoice Number: {selectedInvoice?.invoiceNumber}</Typography>
           <Typography>Issue Date: {selectedInvoice?.issueDate}</Typography>
           {/* <Typography>Due Date: {selectedInvoice?.dueDate}</Typography> */}
@@ -157,6 +185,16 @@ const InvoiceList = () => {
          
         </Box>
       </Modal>
+
+      {/* Edit Modal */}
+      {selectedInvoice && (
+        <EditInvoice
+          invoice={selectedInvoice}
+          open={openEditModal}
+          onClose={() => setOpenEditModal(false)}
+          onUpdate={handleUpdateInvoice}
+        />
+      )}
     </Box>
   );
 };

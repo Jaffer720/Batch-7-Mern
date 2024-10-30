@@ -6,16 +6,27 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const loadUserDetails = () => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setUserDetails(user);
+      setUserDetails(JSON.parse(storedUser));
       setLoading(false);
     } else {
       setError('No user data found.');
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    loadUserDetails();
+    
+    // Listen to changes in localStorage to update user details
+    const handleStorageChange = () => {
+      loadUserDetails();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   if (loading) {

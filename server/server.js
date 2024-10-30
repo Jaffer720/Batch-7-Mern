@@ -12,6 +12,10 @@ import path from "path"
 import { fileURLToPath } from "url";
 
 
+const PORT = process.env.PORT || 8000;
+const HOST = process.env.HOST || '0.0.0.0'; 
+
+
 dotenv.config();
 
 const app = express()
@@ -28,6 +32,11 @@ const corsOptions = {
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
+
+app.get('/',(req,res)=>{
+
+  res.json('Hello From Backend')
+})
 
 // Set endpoints
 
@@ -65,7 +74,6 @@ app.get("/", (req, res) => {
   res.json({ message: "Hello" })
 })
 
-const port = process.env.PORT || 5000;
 
 
 
@@ -79,8 +87,8 @@ app.use((err, req, res, next) => {
     stack: err.stack,
   });
 });
-app.listen(port, () => {
+app.listen(PORT,HOST, () => {
   DatabaseConnection();
-  console.log(`Server Listen on port ${port}`);
+  console.log(`Server Listen on port ${PORT} and Host ${HOST}`);
   console.log("Connected to backend.");
 });

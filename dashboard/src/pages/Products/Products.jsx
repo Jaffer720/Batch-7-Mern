@@ -17,9 +17,15 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
+<<<<<<< HEAD
+=======
+import { MoreVert as MoreVertIcon } from '@mui/icons-material';
+import { BASEURL } from '../URL';
+
+>>>>>>> iftikhar
 
 // Backend API URL
-const API_URL = 'http://localhost:8000/api/product/';
+const API_URL = `${BASEURL}/api/product/`;
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);

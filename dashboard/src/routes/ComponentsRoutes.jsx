@@ -10,6 +10,7 @@ const Dashboard = Loadable(lazy(() => import('../pages/dashboard/default')));
 const Users = Loadable(lazy(() => import('../pages/users/AddUser')));
 const Settings = Loadable(lazy(() => import('../pages/setting/Setting')));
 const Invoice = Loadable(lazy(() => import('../pages/Invoice/Invoice')));
+const EditInvoice = Loadable(lazy(() => import('../pages/Invoice/editInvoice')));
 const Orders = Loadable(lazy(() => import('../pages/Orders/Orders')));
 const Products = Loadable(lazy(() => import('../pages/Products/Products')));
 const Buyer = Loadable(lazy(() => import('../pages/Buyer/Buyer')));
@@ -54,6 +55,10 @@ const ComponentsRoutes = {
     {
       path: 'invoices',
       element: <Invoice />
+    },
+    {
+      path: 'editInvoices',
+      element: <EditInvoice />
     },
     {
       path: 'users',
