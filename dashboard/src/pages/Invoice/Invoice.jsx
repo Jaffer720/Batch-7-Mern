@@ -19,11 +19,11 @@ import { Info as InfoIcon } from '@mui/icons-material'; // Import a different ic
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { MoreVert as MoreVertIcon } from '@mui/icons-material';
 import EditInvoice from './EditInvoice'; // Import the new EditInvoice component
-import { BASEURL } from '../URL';
+// import { BASEURL } from '../URL';
 
 
 // Backend API URL
-const API_URL = `${BASEURL}/api/invoice/`;
+const API_URL = "http://localhost:8000/api/Invoice/";
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);

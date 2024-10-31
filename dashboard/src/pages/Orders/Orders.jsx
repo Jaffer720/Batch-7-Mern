@@ -13,8 +13,9 @@ import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { Edit, MoreVert as MoreVertIcon } from '@mui/icons-material';
 import moment from 'moment';
 import axios from 'axios';
+// import { BASEURL } from '../URL';
 
-const API_URL = 'http://localhost:8000/api/order/';
+const API_URL = "http://localhost:8000/api/order/";
 
 const OrderTable = () => {
   const [orders, setOrders] = useState([]);

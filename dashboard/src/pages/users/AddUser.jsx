@@ -13,9 +13,10 @@ import {
   useMaterialReactTable,
 } from 'material-react-table';
 import { Edit, Delete } from '@mui/icons-material';
+import { BASEURL } from 'pages/URL';
 
 // Backend API URL
-const API_URL = 'http://localhost:8000/api/user/';
+const API_URL = `${BASEURL}/api/user/`;
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
