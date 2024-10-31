@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Grid, Box, TextField, Button, Typography, Link } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { BASEURL } from '../URL';
 
 const Signup = () => {
     const [formData, setFormData] = useState({
@@ -44,7 +45,7 @@ const Signup = () => {
 
     const handleSignup = async () => {
         try {
-            const response = await axios.post('http://localhost:8000/api/auth/register', formData)
+            const response = await axios.post(`${BASEURL}/auth/register`, formData)
 
             if (response.data.status = true) {
 

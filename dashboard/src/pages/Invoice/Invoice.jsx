@@ -9,18 +9,18 @@ import {
   Modal,
   Typography,
 } from '@mui/material';
-<<<<<<< HEAD
+
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
 import { Info as InfoIcon } from '@mui/icons-material'; // Import a different icon
-=======
+
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { MoreVert as MoreVertIcon } from '@mui/icons-material';
 import EditInvoice from './EditInvoice'; // Import the new EditInvoice component
 import { BASEURL } from '../URL';
->>>>>>> iftikhar
+
 
 // Backend API URL
 const API_URL = `${BASEURL}/api/invoice/`;
@@ -150,7 +150,7 @@ const InvoiceList = () => {
 
       {/* Detail Modal */}
       <Modal open={openDetailModal} onClose={() => setOpenDetailModal(false)}>
-<<<<<<< HEAD
+
         <Box
           sx={{
             padding: 4,
@@ -165,10 +165,10 @@ const InvoiceList = () => {
           <Typography variant="h6" gutterBottom>
             Invoice Details
           </Typography>
-=======
+
         <Box sx={{ padding: 4, backgroundColor: 'white', margin: 'auto', marginTop: '1%', width: 400, borderRadius: '8px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
           <Typography variant="h6" gutterBottom>Invoice Details</Typography>
->>>>>>> iftikhar
+
           <Typography>Invoice Number: {selectedInvoice?.invoiceNumber}</Typography>
           <Typography>Issue Date: {selectedInvoice?.issueDate}</Typography>
           {/* <Typography>Due Date: {selectedInvoice?.dueDate}</Typography> */}
