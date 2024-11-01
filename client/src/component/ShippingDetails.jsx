@@ -1,65 +1,73 @@
 import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, Paper, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useCart } from './cartContext';
 
 const ShippingDetails = () => {
-  const [userDetails, setUserDetails] = useState(null);
+  const location = useLocation();
+  const { totalPrice } = location.state || {};
   const [shippingDetails, setShippingDetails] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { user, cartItems, saveOrder } = useCart(); // Get user and saveOrder from context
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setUserDetails(user);
-      setShippingDetails(user.address || {});
+    if (user && Object.keys(user).length > 0) {
+      setShippingDetails(user.address || {}); // Use user details from context
       setLoading(false);
     } else {
       setError('User data not found.');
       setLoading(false);
     }
-  }, []);
+  }, [user]); // Add user as a dependency
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setShippingDetails((prev) => ({ ...prev, [name]: value }));
   };
 
+  const data = {
+    shippingDetails,
+    items: cartItems,
+    user,
+    total: totalPrice
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`http://localhost:8000/api/order/${userDetails._id}`, {
-        shippingDetails,
-        userId: userDetails._id,
-      });
+      const response = await axios.post(`http://localhost:8000/api/order/${user._id}`, data);
 
       if (response.status === 201) {
-        navigate('/thankyou', { state: { shippingDetails, userDetails } });
+        // Save order to context
+        saveOrder({
+          shippingDetails,
+          items: cartItems,
+          total: totalPrice
+        });
+
+        navigate('/thankyou', { state: { shippingDetails, user } });
       } else {
         const errorMessage = 'Error submitting shipping details.';
         setError(errorMessage);
-        navigate('/thankyou', { state: { shippingDetails, userDetails, error: errorMessage } });
+        navigate('/thankyou', { state: { shippingDetails, user, error: errorMessage } });
       }
     } catch (error) {
       console.error('Error:', error);
-      
+
       let errorMessage;
       if (error.response) {
-        // Server responded with a status code outside of the range of 2xx
         errorMessage = `Error: ${error.response.status} - ${error.response.data.message || 'Request failed.'}`;
       } else if (error.request) {
-        // Request was made but no response received
         errorMessage = 'No response received from server. Please check if the backend is running.';
       } else {
-        // Something else triggered the error
         errorMessage = `Error: ${error.message}`;
       }
 
       setError(errorMessage);
-      navigate('/thankyou', { state: { shippingDetails, userDetails, error: errorMessage } });
+      navigate('/thankyou', { state: { shippingDetails, user, error: errorMessage } });
     }
   };
 

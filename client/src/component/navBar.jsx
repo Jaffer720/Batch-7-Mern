@@ -11,7 +11,7 @@ const navLinks = [
   { title: 'Home', path: '/home' },
   { title: 'About', path: '/about' },
   { title: 'Feature', path: '/about' },
-  { title: 'Gallary', path: '/about' },
+  { title: 'Gallery', path: '/about' }, // Typo corrected: "Gallary" to "Gallery"
   { title: 'Contact', path: '/contact' },
 ];
 
@@ -89,9 +89,9 @@ const NavBar = () => {
           {userName ? (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <IconButton onClick={handleMenuClick} sx={{ p: 0 }}>
-                {/* <Avatar alt={userName} sx={{ bgcolor: 'darkblue' }}>
+                <Avatar alt={typeof userName === 'string' ? userName : 'User'} sx={{ bgcolor: 'darkblue' }}>
                   <AccountCircleIcon />
-                </Avatar> */}
+                </Avatar>
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu} sx={{ mt: '15px' }}>
                 <MenuItem onClick={() => { handleCloseMenu(); navigate('/profile'); }}>My Profile</MenuItem>
@@ -108,7 +108,7 @@ const NavBar = () => {
                 variant="contained"
                 sx={{
                   backgroundColor: '#FF4081',
-                  color: 'white=',
+                  color: 'white',
                   borderRadius: '5px',
                   '&:hover': {
                     backgroundColor: '#FF79B0',

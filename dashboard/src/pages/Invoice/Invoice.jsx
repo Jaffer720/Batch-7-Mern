@@ -1,3 +1,4 @@
+// InvoiceList.js
 import React, { useState, useMemo, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -8,21 +9,36 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
+
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
 import { Delete as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
+import { MoreVert as MoreVertIcon } from '@mui/icons-material';
+import EditInvoice from './EditInvoice'; // Import the new EditInvoice component
+// import { BASEURL } from '../URL';
+
+
 // Backend API URL
+<<<<<<< HEAD
 const API_URL = 'http://localhost:8000/api/Invoice/';
+=======
+const API_URL = "http://localhost:8000/api/Invoice/";
+>>>>>>> shahid
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [openDetailModal, setOpenDetailModal] = useState(false);
+<<<<<<< HEAD
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+=======
+  const [openEditModal, setOpenEditModal] = useState(false);
+>>>>>>> shahid
 
   // Fetch invoices from backend
   useEffect(() => {
@@ -37,6 +53,7 @@ const InvoiceList = () => {
     fetchInvoices();
   }, []);
 
+<<<<<<< HEAD
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this invoice?');
     if (confirmDelete) {
@@ -51,6 +68,12 @@ const InvoiceList = () => {
         setOpenSnackbar(true);
       }
     }
+=======
+  const handleUpdateInvoice = (updatedInvoice) => {
+    setInvoices((prev) =>
+      prev.map((invoice) => (invoice.invoiceNumber === updatedInvoice.invoiceNumber ? updatedInvoice : invoice))
+    );
+>>>>>>> shahid
   };
 
   const columns = useMemo(
@@ -61,7 +84,11 @@ const InvoiceList = () => {
         size: 100,
       },
       {
+<<<<<<< HEAD
         accessorKey: 'customer.email',
+=======
+        accessorKey: 'customer.email', // Use a specific field of customer
+>>>>>>> shahid
         header: 'Customer Email',
         size: 200,
       },
@@ -98,6 +125,7 @@ const InvoiceList = () => {
               sx={{ color: 'grey' }} // Set the color for the Delete icon
               title="Delete Invoice"
             >
+<<<<<<< HEAD
               <DeleteIcon />
             </IconButton>
           </Box>
@@ -105,6 +133,43 @@ const InvoiceList = () => {
       },
     ],
     [invoices],
+=======
+              <MenuItem
+                onClick={() => {
+                  setOpenEditModal(true);
+                  setAnchorEl(null);
+                }}
+              >
+                Edit
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setOpenDetailModal(true);
+                  setAnchorEl(null);
+                }}
+              >
+                View
+              </MenuItem>
+              <MenuItem
+                onClick={async () => {
+                  try {
+                    await axios.delete(`${API_URL}${row.original.invoiceNumber}`);
+                    setInvoices(invoices.filter(invoice => invoice.invoiceNumber !== row.original.invoiceNumber));
+                  } catch (error) {
+                    console.error('Error deleting invoice:', error);
+                  }
+                  setAnchorEl(null);
+                }}
+              >
+                Delete
+              </MenuItem>
+            </Menu>
+          </>
+        ),
+      },
+    ],
+    [anchorEl, selectedInvoice, invoices]
+>>>>>>> shahid
   );
 
   const table = useMaterialReactTable({
@@ -128,6 +193,7 @@ const InvoiceList = () => {
 
       {/* Detail Modal */}
       <Modal open={openDetailModal} onClose={() => setOpenDetailModal(false)}>
+
         <Box
           sx={{
             padding: 4,
@@ -142,24 +208,28 @@ const InvoiceList = () => {
           <Typography variant="h6" gutterBottom>
             Invoice Details
           </Typography>
+
+        <Box sx={{ padding: 4, backgroundColor: 'white', margin: 'auto', marginTop: '1%', width: 400, borderRadius: '8px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h6" gutterBottom>Invoice Details</Typography>
+
           <Typography>Invoice Number: {selectedInvoice?.invoiceNumber}</Typography>
           <Typography>Issue Date: {selectedInvoice?.issueDate}</Typography>
-          <Typography>Due Date: {selectedInvoice?.dueDate}</Typography>
+          {/* <Typography>Due Date: {selectedInvoice?.dueDate}</Typography> */}
           <Typography>
             Customer Email: {selectedInvoice?.customer?.email || 'N/A'}
           </Typography>
           <Typography>
             Customer ID: {selectedInvoice?.customer?._id || 'N/A'}
           </Typography>
-          <Typography>Items: {selectedInvoice?.items?.join(', ')}</Typography>
+          <Typography>Items: {selectedInvoice?.items?.product}</Typography>
           <Typography>Quantities: {selectedInvoice?.quantities?.join(', ')}</Typography>
-          <Typography>Subtotal: {selectedInvoice?.subtotal}</Typography>
           <Typography>Total: {selectedInvoice?.total}</Typography>
           <Typography>Payment Status: {selectedInvoice?.paymentStatus}</Typography>
-          <Typography>Notes: {selectedInvoice?.notes}</Typography>
+         
         </Box>
       </Modal>
 
+<<<<<<< HEAD
       {/* Snackbar for notifications */}
       <Snackbar
         open={openSnackbar}
@@ -171,6 +241,17 @@ const InvoiceList = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+=======
+      {/* Edit Modal */}
+      {selectedInvoice && (
+        <EditInvoice
+          invoice={selectedInvoice}
+          open={openEditModal}
+          onClose={() => setOpenEditModal(false)}
+          onUpdate={handleUpdateInvoice}
+        />
+      )}
+>>>>>>> shahid
     </Box>
   );
 };

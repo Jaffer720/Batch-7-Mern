@@ -6,6 +6,7 @@ import { useCart } from './cartContext';
 const ViewCart = () => {
   const { cartItems, clearCart, removeFromCart, user } = useCart(); // Access user from context
   const navigate = useNavigate();
+  console.log('cartItems', cartItems)
 
   // Group products by name, color, and size
   const groupedCartItems = cartItems.reduce((acc, item) => {
@@ -15,7 +16,7 @@ const ViewCart = () => {
       existingItem.quantity += 1;
       existingItem.totalPrice += parseFloat(item.price);
     } else {
-      acc.push({ ...item, quantity: 1, totalPrice: parseFloat(item.price) });
+      acc.push({ ...item, quantity: 1, totalPrice: parseFloat(item.price), image: item.image }); // Ensure image is included
     }
     return acc;
   }, []);

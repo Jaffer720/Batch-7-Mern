@@ -20,6 +20,7 @@ const Signup = () => {
     phone: '',
     dateOfBirth: '',
   });
+  const [errorMessage, setErrorMessage] = useState(''); // State for error messages
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -42,18 +43,27 @@ const Signup = () => {
   };
 
   const handleSignup = async () => {
+    // Basic validation before sending the request
+    const { username, email, password } = formData;
+
+    if (!username || !email || !password) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/register', formData)
-
-      if (response.data.status=true) {
-
-        console.log("Successful", response.data)
+      const response = await axios.post('http://localhost:8000/api/auth/register', formData);
+      
+      // Corrected the equality check
+      if (response.data.status === true) {
+        console.log("Signup Successful", response.data);
         navigate('/');
       } else {
-        alert('Registration failed');
+        setErrorMessage('Registration failed. Please try again.');
       }
     } catch (error) {
       console.error('Signup error:', error);
+      setErrorMessage('An error occurred while signing up. Please try again later.');
     }
   };
 
@@ -64,6 +74,7 @@ const Signup = () => {
           <Typography variant="h5" component="h1" gutterBottom>
             Sign Up
           </Typography>
+          {errorMessage && <Typography color="error" variant="body2" align="center">{errorMessage}</Typography>}
           <TextField
             label="Username"
             name="username"
@@ -72,6 +83,7 @@ const Signup = () => {
             margin="normal"
             value={formData.username}
             onChange={handleChange}
+            required
           />
           <TextField
             label="Email"
@@ -81,6 +93,7 @@ const Signup = () => {
             margin="normal"
             value={formData.email}
             onChange={handleChange}
+            required
           />
           <TextField
             label="Password"
@@ -91,6 +104,7 @@ const Signup = () => {
             margin="normal"
             value={formData.password}
             onChange={handleChange}
+            required
           />
           <TextField
             label="First Name"
